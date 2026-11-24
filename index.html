@@ -3,19 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Camille Taylor</title>
-<meta name="description" content="Camille Taylor. An ongoing experiment in creation and independence, working across art, technology, commerce and local economies.">
+<title>cami's playground</title>
 <script>(function(){var t=null;try{t=localStorage.getItem("ct-theme")}catch(e){}document.documentElement.dataset.theme=t||"dark"})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Sora:wght@300..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* VOICE  personal index, quiet and a little cosmic
-   IDEA   an observatory plate: a live strange attractor photographed like a nebula, with its equation and readings in the margin
-   PICTURE the Clifford attractor, millions of iterations rendered as light, reshaped by the pointer
-   COLOUR deep space ground with violet, magenta and teal light; light mode is the same plate printed in ink on paper
-   TYPE   Michroma (space-age wide) for the wordmark and labels, Sora for text, Plex Mono for readings
-   LAYOUT wordmark across the plate; a full-width typographic index of projects below; no illustrations */
 :root{color-scheme:dark;--bg:#05060d;--ink:#ecedf7;--soft:#9a9cb5;--line:#1f2234;--chip:#0e1020;--accent:#a98bff}
 :root[data-theme=light]{color-scheme:light;--bg:#f3f2ec;--ink:#14141b;--soft:#5d5c66;--line:#d8d6cc;--chip:#e9e7df;--accent:#4a2fd1}
 *{box-sizing:border-box;min-width:0}
@@ -24,14 +17,13 @@ body{margin:0;background:var(--bg);color:var(--ink);font:300 17px/1.6 Sora,syste
 #sky{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
 #brush{position:fixed;inset:0;width:100%;height:100%;z-index:60;pointer-events:none}
 html.brushing,html.brushing *{cursor:none!important}
-header,main,footer{position:relative;z-index:1}
+header,main{position:relative;z-index:1}
 header{position:sticky}
 a{color:inherit}
 .mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
 .wrap{max-width:1240px;margin:0 auto;padding-left:max(5vw,16px);padding-right:max(5vw,16px)}
 header{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:64px;flex-wrap:wrap}
-.mark{font:400 17px/1 Michroma,sans-serif;letter-spacing:.02em;text-decoration:none}
+.bar{display:flex;align-items:center;justify-content:flex-end;gap:16px;min-height:64px;flex-wrap:wrap}
 nav{display:flex;gap:18px;align-items:center;font-size:15px}
 nav a{text-decoration:none;padding:10px 0;border-bottom:1px solid transparent}
 nav a:hover,nav a:focus-visible{border-color:currentColor}
@@ -49,15 +41,11 @@ nav a:hover,nav a:focus-visible{border-color:currentColor}
 #field{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;cursor:crosshair}
 .hero{position:relative;pointer-events:none;padding-top:clamp(36px,7vw,96px);padding-bottom:clamp(24px,3vw,40px);min-height:min(78svh,760px);display:flex;flex-direction:column;justify-content:space-between;gap:32px}
 .hero a,.hero button{pointer-events:auto}
-.name{font:400 clamp(40px,10vw,400px)/.9 Michroma,sans-serif;letter-spacing:-.01em;margin:0;white-space:nowrap;color:var(--ink)}
-.name span{display:inline-block;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
-.lede{margin:clamp(12px,2vw,24px) 0 clamp(24px,3vw,36px);color:var(--soft);font:300 clamp(18px,2vw,26px)/1.3 Sora,sans-serif;letter-spacing:.01em;text-shadow:0 0 18px var(--bg)}
-.upd{display:block;margin-top:10px;color:var(--soft);font-size:14px;letter-spacing:0}
+.lede{margin:0;color:var(--soft);font:300 clamp(16px,1.6vw,20px)/1.3 Sora,sans-serif;letter-spacing:.01em;text-shadow:0 0 18px var(--bg)}
 .readout{margin-top:22px}
 .readout{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;font-size:13px;color:var(--soft);border-top:1px solid var(--line);padding-top:14px}
 .readout b{font-weight:500;color:var(--ink)}
 .readout .eq{overflow-wrap:anywhere}
-section{border-top:1px solid var(--ink);padding-top:22px;padding-bottom:clamp(40px,6vw,88px)}
 .lab{position:relative;min-height:clamp(360px,72svh,760px)}
 .lab-sm{min-height:clamp(280px,48svh,520px)}
 .toylab{min-height:0;height:min(86svh,820px);margin-top:clamp(48px,9svh,110px)}
@@ -92,17 +80,35 @@ section{border-top:1px solid var(--ink);padding-top:22px;padding-bottom:clamp(40
 .conn span{color:var(--soft);font-size:16px;overflow-wrap:anywhere}
 .conn a:hover b,.conn a:focus-visible b{text-decoration:underline;text-underline-offset:5px}
 footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);font-size:14px}
-footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 @media(max-width:860px){
 .hero{min-height:min(72svh,580px)}
 }
 @media(max-width:600px){
 .sky{display:none}
-.row>a,.row>div{grid-template-columns:32px minmax(0,1fr);row-gap:8px}
-.host{grid-column:2}
 .hero{padding-bottom:20px}
 .heroband{min-height:0}
 }
+/* scrollbar: a thin rail of light that takes on the colours of the toy in view */
+:root{--sb1:#8a6cff;--sb2:#e94faa}
+:root[data-zone=scope]{--sb1:#58e0d8;--sb2:#86e39a}
+:root[data-zone=harm]{--sb1:#7d6bff;--sb2:#ff8ad8}
+:root[data-zone=rd]{--sb1:#c9a6ff;--sb2:#f5e0ff}
+:root[data-zone=julia]{--sb1:#9a5cff;--sb2:#ffd38a}
+:root[data-zone=four]{--sb1:#5fd6ff;--sb2:#c45cff}
+:root[data-zone=mold]{--sb1:#e45cc0;--sb2:#cdf3ff}
+:root[data-zone=bolt]{--sb1:#8c78ff;--sb2:#eef1ff}
+:root[data-theme=light]{--sb1:#4a2fd1;--sb2:#b0185a}
+:root[data-theme=light][data-zone=scope]{--sb1:#0f766e;--sb2:#2f7d3a}
+:root[data-theme=light][data-zone=julia]{--sb1:#4a2aa8;--sb2:#8a4a00}
+:root[data-theme=light][data-zone=four]{--sb1:#0b5e86;--sb2:#5b3cc4}
+:root[data-theme=light][data-zone=mold]{--sb1:#3a2380;--sb2:#14305f}
+:root[data-theme=light][data-zone=bolt]{--sb1:#4a2fd1;--sb2:#14141b}
+::-webkit-scrollbar{width:12px;height:12px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--sb1),var(--sb2)) padding-box;border:4px solid transparent;border-radius:99px;min-height:48px}
+::-webkit-scrollbar-thumb:hover{border-width:3px}
+::-webkit-scrollbar-corner{background:var(--bg)}
+@supports not selector(::-webkit-scrollbar){html{scrollbar-width:thin;scrollbar-color:var(--sb2) transparent}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
@@ -111,8 +117,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 <canvas id="brush" aria-hidden="true"></canvas>
 <header>
   <div class="wrap bar">
-    <a class="mark" href="#top" aria-label="Camille Taylor, back to top">CAMILLE.</a>
-    <nav aria-label="Sections">
+    <nav aria-label="Sky and theme">
       <span class="sky mono" id="skyinfo"><span id="clock">Satsuma, FL</span><svg id="moonic" viewBox="0 0 16 16" aria-hidden="true"></svg><span id="phase"></span></span>
       <button class="mode" id="mode" type="button" aria-label="Switch to light mode"><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" fill="currentColor"/></svg><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg></button>
     </nav>
@@ -124,8 +129,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <canvas id="field" aria-label="A strange attractor that reshapes as you move the pointer"></canvas>
     <div class="wrap hero">
       <div>
-        <h1 class="name" id="name" aria-label="Camille Taylor"><span>C</span><span>A</span><span>M</span><span>I</span><span>L</span><span>L</span><span>E</span><span>.</span></h1>
-        <p class="lede">cami's playground</p>
+        <h1 class="lede">cami's playground</h1>
       </div>
       <div>
         <div class="readout mono">
@@ -187,6 +191,15 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       <div class="mag mono" role="group" aria-label="Pattern"><button type="button" data-p="neurons" aria-pressed="true">Neurons</button><button type="button" data-p="rivers">Rivers</button><button type="button" data-p="filaments">Filaments</button></div>
       <span class="hint mono">Hover to feed it · click to tear the network</span>
       <span class="tag mono" aria-hidden="true">Lab · slot 06 · slime mold</span>
+    </div>
+
+    <!-- LAB SLOT 07: lightning (dielectric breakdown). -->
+    <div class="lab toylab" id="lab-e">
+      <canvas class="toy" id="bolt" aria-label="Lightning: draw lightning rods and the bolt will find them"></canvas>
+      <div class="eqn mono"><span>∇²φ = 0 · a branch grows at cell i with P(i) = φᵢ<sup>η</sup> / Σ φⱼ<sup>η</sup></span><span id="eread"></span></div>
+      <div class="mag mono" role="group" aria-label="Discharge"><button type="button" data-p="bolt" aria-pressed="true">Lightning</button><button type="button" data-p="lich">Lichtenberg</button><button type="button" data-act="field" aria-pressed="true">Field</button><button type="button" data-act="clear">Clear</button></div>
+      <span class="hint mono">Draw lightning rods · the bolt will find them</span>
+      <span class="tag mono" aria-hidden="true">Lab · slot 07 · lightning</span>
     </div>
   </div>
 </main>
@@ -1329,6 +1342,234 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     });
   }
 
+  // ---------- Lab slot 07: lightning, the dielectric breakdown model ----------
+  {
+    const lab = document.getElementById("lab-e"), cv7 = document.getElementById("bolt"), g = cv7.getContext("2d"), rd7 = document.getElementById("eread");
+    const PRE = { bolt: { eta: 2, k: 14, step: true, name: "lightning" }, lich: { eta: 1, k: 9, step: false, name: "Lichtenberg figure" } };
+    let P = PRE.bolt, showField = true, LW = 0, LH = 0, CS = 6, GX = 0, GY = 0, N = 0, ground = 0, top0 = 0, vis = false;
+    let phi, base, cond, state, par, born, cnt, onMain, px, py, kx, ky, dist, near;
+    let chan = [], cand = new Set(), strokes = [], curStroke = null, rodCells = [], phase = "grow", tPhase = 0, nextStep = 0, strikes = 0;
+    let roots = [], mainPts = [], forkPts = null, impact = null, pulses = [];
+    let nb = [];
+    const R = Math.random;
+    const stamp = (u, v, rad) => {
+      const cx = Math.round(u * LW / CS), cy = Math.round(v * LH / CS);
+      for (let y = -rad; y <= rad; y++) for (let x = -rad; x <= rad; x++) {
+        if (x * x + y * y > rad * rad + rad) continue;
+        const xx = cx + x, yy = cy + y; if (xx < 1 || yy <= top0 + 1 || xx > GX - 2 || yy > GY - 2) continue;
+        const i = yy * GX + xx; base[i] = 1; cond[i] = 1; if (!state[i]) phi[i] = 1;
+      }
+    };
+    const stampSeg = (a, b2) => { const d = Math.hypot((b2[0] - a[0]) * LW, (b2[1] - a[1]) * LH), n = Math.max(1, Math.ceil(d / (CS * 0.7))); for (let i = 0; i <= n; i++) stamp(a[0] + (b2[0] - a[0]) * i / n, a[1] + (b2[1] - a[1]) * i / n, 1); };
+    // distance from every cell to the nearest rod or ground, used to find forked strikes
+    const bfs = () => {
+      dist.fill(1 << 30); near.fill(-1); const q = new Int32Array(N); let h = 0, t = 0;
+      for (let i = 0; i < N; i++) if (base[i]) { dist[i] = 0; near[i] = i; q[t++] = i; }
+      while (h < t) { const i = q[h++], x = i % GX; for (const o of [-1, 1, -GX, GX]) { const j = i + o; if (j < 0 || j >= N || (o === -1 && x === 0) || (o === 1 && x === GX - 1)) continue; if (dist[j] > dist[i] + 1) { dist[j] = dist[i] + 1; near[j] = near[i]; q[t++] = j; } } }
+    };
+    const rasterize = () => {
+      base.fill(0); cond.fill(0);
+      for (let y = ground; y < GY; y++) for (let x = 0; x < GX; x++) { base[y * GX + x] = 1; cond[y * GX + x] = 1; }
+      for (const st of strokes) { if (st.length === 1) stamp(st[0][0], st[0][1], 1); for (let i = 1; i < st.length; i++) stampSeg(st[i - 1], st[i]); }
+      bfs();
+    };
+    const cc = i => [(i % GX) * CS + CS / 2, ((i / GX) | 0) * CS + CS / 2];
+    const addChan = (i, p, now) => {
+      state[i] = 1; par[i] = p; born[i] = now; onMain[i] = 0; chan.push(i); phi[i] = 0; cand.delete(i);
+      const [x0, y0] = cc(i); px[i] = x0 + (R() - 0.5) * CS * 0.95; py[i] = y0 + (R() - 0.5) * CS * 0.95;
+      if (p >= 0) { const mx = (px[p] + px[i]) / 2, my = (py[p] + py[i]) / 2, dx = px[i] - px[p], dy = py[i] - py[p], L = Math.hypot(dx, dy) || 1, off = (R() - 0.5) * 0.7 * L; kx[i] = mx - dy / L * off; ky[i] = my + dx / L * off; }
+      else { kx[i] = px[i]; ky[i] = top0 * CS; }
+      const x = i % GX;
+      for (const o of nb) { const j = i + o, jx = j % GX, jy = (j / GX) | 0; if (jx < 1 || jy <= top0 || jx > GX - 2 || jy > GY - 2 || Math.abs(jx - x) > 1) continue; if (!state[j] && !cond[j]) cand.add(j); }
+    };
+    const newBolt = now => {
+      state.fill(0); onMain.fill(0); par.fill(-1); chan = []; cand.clear(); mainPts = []; forkPts = null; impact = null; phase = "grow"; roots = [];
+      for (let y = 0; y < GY; y++) for (let x = 0; x < GX; x++) { const i = y * GX + x; phi[i] = y <= top0 ? 0 : cond[i] ? 1 : Math.min(1, (y - top0) / Math.max(1, ground - top0)); }
+      // the cloud: the whole top edge holds charge; one to three leaders break out of it
+      const n = 1 + (R() < 0.35 ? 1 : 0) + (R() < 0.12 ? 1 : 0);
+      for (let k = 0; k < n; k++) { const sx = Math.floor(GX * (0.15 + R() * 0.7)), ri = (top0 + 1) * GX + sx; if (state[ri]) continue; addChan(ri, -1, now); roots.push(ri);
+        let cur = ri; for (let st = 0; st < 7; st++) { const dx = R() < 0.3 ? -1 : R() < 0.43 ? 1 : 0, nx = cur + GX + dx; if (nx % GX < 2 || nx % GX > GX - 3 || state[nx] || cond[nx]) break; addChan(nx, cur, now - 2000); cur = nx; } }
+      nextStep = now;
+    };
+    const size = () => {
+      const r = lab.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
+      if (Math.abs(r.width - LW) < 2 && Math.abs(r.height - LH) < 2) return;
+      LW = r.width; LH = r.height; cv7.width = Math.round(LW * dpr); cv7.height = Math.round(LH * dpr); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      CS = LW < 600 ? 5 : 6; GX = Math.floor(LW / CS); GY = Math.floor(LH / CS); N = GX * GY;
+      nb = [-1, 1, -GX, GX, -GX - 1, -GX + 1, GX - 1, GX + 1];
+      ground = GY - Math.ceil(104 / CS); top0 = Math.ceil(124 / CS);
+      phi = new Float32Array(N); base = new Uint8Array(N); cond = new Uint8Array(N); state = new Uint8Array(N); onMain = new Uint8Array(N);
+      par = new Int32Array(N); cnt = new Int32Array(N); dist = new Int32Array(N); near = new Int32Array(N);
+      born = new Float32Array(N); px = new Float32Array(N); py = new Float32Array(N); kx = new Float32Array(N); ky = new Float32Array(N);
+      rodCells = []; rasterize(); newBolt(performance.now());
+    };
+    size(); const ro = new ResizeObserver(size); ro.observe(lab);
+    const relax = sweeps => {
+      for (let s = 0; s < sweeps; s++) {
+        for (let y = top0 + 1; y < GY - 1; y++) { const row = y * GX; for (let x = 1; x < GX - 1; x++) { const i = row + x; if (state[i] || cond[i]) continue; const v = (phi[i - 1] + phi[i + 1] + phi[i - GX] + phi[i + GX]) * 0.25; phi[i] += 1.85 * (v - phi[i]); } }
+        for (let y = top0 + 1; y < GY; y++) { const row = y * GX; if (!cond[row]) phi[row] = phi[row + 1]; if (!cond[row + GX - 1]) phi[row + GX - 1] = phi[row + GX - 2]; }
+      }
+    };
+    const pathPts = (from, stopAtMain) => {
+      const pts = [];
+      for (let i = from; i >= 0; i = par[i]) {
+        pts.push([px[i], py[i]]);
+        if (stopAtMain && onMain[i] && i !== from) break;
+        if (!stopAtMain) onMain[i] = 1;
+        pts.push([kx[i], ky[i]]);
+      }
+      return pts;
+    };
+    const jag = (a, b2, n) => { const out = []; for (let k = 1; k < n; k++) { const u = k / n; out.push([a[0] + (b2[0] - a[0]) * u + (R() - 0.5) * 7, a[1] + (b2[1] - a[1]) * u + (R() - 0.5) * 7]); } return out; };
+    const doStrike = (j, q, now) => {
+      phase = "strike"; tPhase = now; strikes++;
+      const [ix, iy] = cc(q); impact = [ix, iy];
+      mainPts = [impact, ...jag(impact, [px[j], py[j]], 2), ...pathPts(j, false)];
+      // re-strikes: dart leaders run down the same warm channel two or three more times
+      pulses = [[0, 1]]; let t0 = 0; const m = 1 + ((R() * 3) | 0); for (let k = 0; k < m; k++) { t0 += 140 + R() * 160; pulses.push([t0, 0.55 + R() * 0.4]); }
+      // a nearby branch sometimes completes its own strike: a forked bolt
+      forkPts = null;
+      if (R() < 0.7) {
+        let best = -1, bd = 6;
+        for (const i of chan) { if (onMain[i] || dist[i] >= bd || near[i] < 0) continue; let s2 = 0, a = i; while (a >= 0 && !onMain[a]) { a = par[a]; s2++; } if (s2 >= 8) { best = i; bd = dist[i]; } }
+        if (best >= 0) { const t2 = cc(near[best]); forkPts = [t2, ...jag(t2, [px[best], py[best]], 3), ...pathPts(best, true)]; }
+      }
+    };
+    const grow = (now, n) => {
+      if (!cand.size) { newBolt(now); return; }
+      const arr = Array.from(cand), w = new Float32Array(arr.length); let tot = 0;
+      for (let k = 0; k < arr.length; k++) { const v = Math.max(0, phi[arr[k]]); w[k] = Math.pow(v, P.eta); tot += w[k]; }
+      if (tot <= 0) return;
+      for (let pick = 0; pick < n; pick++) {
+        let r = R() * tot, k = 0; while (k < arr.length - 1 && (r -= w[k]) > 0) k++;
+        const j = arr[k]; if (state[j]) continue;
+        const ps = []; for (const o of nb) { const q = j + o; if (q >= 0 && q < N && state[q] && Math.abs((q % GX) - (j % GX)) <= 1) ps.push(q); }
+        if (!ps.length) continue;
+        addChan(j, ps[(R() * ps.length) | 0], now); tot -= w[k]; w[k] = 0;
+        for (const o of nb) { const q = j + o; if (q >= 0 && q < N && cond[q] && Math.abs((q % GX) - (j % GX)) <= 1) { doStrike(j, q, now); return; } }
+      }
+      if (chan.length > N * 0.3) newBolt(now);
+    };
+    const line = pts => { g.beginPath(); pts.forEach((q, k) => k ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1])); };
+    const drawField = dark => {
+      const S = LW < 600 ? 16 : 20, m0 = 2 / Math.max(1, ground - top0), B = [[], [], [], []];
+      for (let y = top0 * CS + S; y < ground * CS - S / 2; y += S) for (let x = S / 2; x < LW; x += S) {
+        const cx = Math.min(GX - 2, Math.max(1, Math.floor(x / CS))), cy = Math.min(GY - 2, Math.max(1, Math.floor(y / CS))), i = cy * GX + cx;
+        if (cond[i] || state[i]) continue;
+        const ex = phi[i + 1] - phi[i - 1], ey = phi[i + GX] - phi[i - GX], m = Math.hypot(ex, ey); if (m < 1e-6) continue;
+        const hsh = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453, jx = (hsh - Math.floor(hsh) - 0.5) * S * 0.8, jy = ((hsh * 7.13) - Math.floor(hsh * 7.13) - 0.5) * S * 0.8;
+        const edge = Math.min(1, x / 90, (LW - x) / 90, (y - top0 * CS) / 70, (ground * CS - y) / 50);
+        const st = m / m0, lev = Math.min(3, Math.floor(Math.log2(1 + st) * 1.3 * edge + (edge < 0.5 ? -1 : 0))); if (lev < 0) continue;
+        const L = S * (0.2 + 0.16 * Math.min(1, st / 3)), X = x + jx, Y = y + jy;
+        B[lev].push(X - ex / m * L, Y - ey / m * L, X + ex / m * L, Y + ey / m * L);
+      }
+      const AL = [0.05, 0.11, 0.2, 0.32]; g.lineWidth = 1; g.lineCap = "round";
+      for (let b = 0; b < 4; b++) { const a = B[b]; if (!a.length) continue; g.strokeStyle = dark ? `rgba(172,182,255,${AL[b]})` : `rgba(40,32,110,${AL[b] * 0.9})`; g.beginPath(); for (let k = 0; k < a.length; k += 4) { g.moveTo(a[k], a[k + 1]); g.lineTo(a[k + 2], a[k + 3]); } g.stroke(); }
+    };
+    const intensity = dt => {
+      if (reduceMotion) return Math.exp(-dt / 700);
+      let I = 0.12 * Math.exp(-dt / 1200);
+      for (const [t0, amp] of pulses) if (dt >= t0) I = Math.max(I, amp * Math.exp(-(dt - t0) / 65));
+      return I;
+    };
+    const draw = now => {
+      const dark = root.dataset.theme !== "light";
+      g.clearRect(0, 0, LW, LH);
+      if (showField) drawField(dark);
+      g.lineCap = "round"; g.lineJoin = "round";
+      g.strokeStyle = dark ? "rgba(214,206,255,.55)" : "rgba(40,32,90,.55)"; g.lineWidth = 2;
+      for (const st of [...strokes, ...(curStroke ? [curStroke] : [])]) { g.beginPath(); st.forEach((q, k) => { const x = q[0] * LW, y = q[1] * LH; k ? g.lineTo(x, y) : g.moveTo(x, y); }); if (st.length === 1) g.lineTo(st[0][0] * LW + 0.1, st[0][1] * LH); g.stroke(); }
+      // how much current each branch carries: the number of branches feeding it
+      for (const i of chan) cnt[i] = 1;
+      for (let k = chan.length - 1; k >= 0; k--) { const i = chan[k]; if (par[i] >= 0) cnt[par[i]] += cnt[i]; }
+      const striking = phase === "strike", dt = now - tPhase, I = striking ? intensity(dt) : 0, fr = striking ? Math.min(1, dt / 80) : 0;
+      const leaderA = striking ? Math.max(0, 1 - dt / 450) : 1, branchA = striking && fr >= 1 ? 0.45 * I : 0;
+      g.globalCompositeOperation = dark ? "lighter" : "source-over";
+      const W = [0.5, 0.8, 1.2, 1.7, 2.3], B = [];
+      for (const i of chan) {
+        if (par[i] < 0 || onMain[i] && striking) continue;
+        const wl = Math.min(4, Math.floor(Math.log2(cnt[i]) / 2.2)), age = now - born[i], al = age < 90 ? 0 : age < 350 ? 1 : 2, key = wl * 3 + al;
+        (B[key] || (B[key] = [])).push(i);
+      }
+      const AL = [1, 0.62, 0.36];
+      for (let key = 0; key < 15; key++) {
+        const list = B[key]; if (!list) continue;
+        const wl = (key / 3) | 0, al = key % 3, a = Math.min(1, AL[al] * leaderA + branchA * (0.5 + wl * 0.15));
+        if (a < 0.01) continue;
+        g.beginPath(); for (const i of list) { const p = par[i]; g.moveTo(px[p], py[p]); g.lineTo(kx[i], ky[i]); g.lineTo(px[i], py[i]); }
+        if (dark) { g.strokeStyle = `rgba(140,118,255,${0.16 * a})`; g.lineWidth = W[wl] * 4 + 2; g.stroke(); g.strokeStyle = `rgba(214,220,255,${a})`; }
+        else g.strokeStyle = `rgba(52,34,150,${a})`;
+        g.lineWidth = W[wl]; g.stroke();
+      }
+      if (striking && mainPts.length) {
+        const [ax, ay] = [px[roots[0]] || LW / 2, top0 * CS], [ix, iy] = impact;
+        // soft flash, the lit cloud, and the spot it hit
+        if (!reduceMotion) {
+          const mx = (ax + ix) / 2, my = (ay + iy) / 2, frr = Math.min(Math.hypot(ix - ax, iy - ay) * 0.5 + 160, mx, LW - mx, my, LH - my) + 0.1, fg = g.createRadialGradient(mx, my, 0, mx, my, frr);
+          fg.addColorStop(0, dark ? `rgba(170,180,255,${0.2 * I})` : `rgba(74,47,209,${0.07 * I})`); fg.addColorStop(1, "rgba(0,0,0,0)"); g.fillStyle = fg; g.fillRect(0, 0, LW, LH);
+        }
+        const sx = Math.min(2.4, Math.max(1, (Math.min(ax, LW - ax) - 4) / 100)), cx2 = ax; g.save(); g.translate(cx2, ay); g.scale(sx, 1);
+        const cg = g.createRadialGradient(0, 0, 0, 0, 0, 100); cg.addColorStop(0, dark ? `rgba(200,195,255,${0.55 * I})` : `rgba(74,47,209,${0.2 * I})`); cg.addColorStop(1, "rgba(0,0,0,0)");
+        g.fillStyle = cg; g.fillRect(-100, -100, 200, 200); g.restore();
+        const hr = 50 + 60 * I, hg = g.createRadialGradient(ix, iy, 0, ix, iy, hr);
+        hg.addColorStop(0, dark ? `rgba(235,238,255,${0.7 * I})` : `rgba(74,47,209,${0.25 * I})`); hg.addColorStop(1, "rgba(0,0,0,0)"); g.fillStyle = hg; g.fillRect(ix - hr, iy - hr, hr * 2, hr * 2);
+        // afterimage: the bolt burned into your eyes, in the complementary colour
+        if (dt > 120) { const ai = 0.32 * Math.exp(-(dt - 120) / 800) * (1 - Math.min(1, I)); if (ai > 0.01) { line(mainPts); g.strokeStyle = dark ? `rgba(170,255,210,${ai})` : `rgba(74,47,209,${ai * 0.6})`; g.lineWidth = 3.5; g.stroke(); } }
+        // return stroke: lights from the ground upward, then the re-strikes flash the whole channel
+        const n = Math.max(2, Math.ceil(mainPts.length * fr)), mp = mainPts.slice(0, n), fp = forkPts && fr >= 1 ? forkPts : null;
+        for (const [pts, k2] of [[mp, 1], ...(fp ? [[fp, 0.8]] : [])]) {
+          line(pts);
+          if (dark) {
+            g.strokeStyle = `rgba(130,110,255,${0.22 * I * k2})`; g.lineWidth = 18; g.stroke();
+            g.strokeStyle = `rgba(190,205,255,${0.55 * I * k2})`; g.lineWidth = 6; g.stroke();
+            g.strokeStyle = `rgba(255,255,255,${Math.min(1, (I + 0.08) * k2)})`; g.lineWidth = 2.4 * k2; g.stroke();
+          } else {
+            g.strokeStyle = `rgba(74,47,209,${0.22 * I * k2})`; g.lineWidth = 8; g.stroke();
+            g.strokeStyle = `rgba(20,14,60,${Math.min(1, (I + 0.15) * k2)})`; g.lineWidth = 2.4 * k2; g.stroke();
+          }
+        }
+      }
+      g.globalCompositeOperation = "source-over";
+    };
+    const frame = t => {
+      if (!vis) return;
+      if (phase === "grow") {
+        relax(LW < 600 ? 10 : 14);
+        if (!P.step) grow(t, P.k);
+        else if (t >= nextStep) { grow(t, P.k); nextStep = t + 35 + R() * 90; }
+      } else if (t - tPhase > 2300) newBolt(t);
+      draw(t);
+      rd7.textContent = `η = ${P.eta} · ${P.name} · ${roots.length} leader${roots.length > 1 ? "s" : ""} · channel ${chan.length.toLocaleString()} cells · strikes ${strikes}`;
+      requestAnimationFrame(frame);
+    };
+    const io = new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !vis) { vis = true; requestAnimationFrame(frame); } if (!v) vis = false; }); io.observe(lab);
+    // the pointer itself is a lightning rod
+    const setRod = (u, v) => {
+      for (const i of rodCells) { cond[i] = base[i]; if (!cond[i] && !state[i]) phi[i] = 0.8; }
+      rodCells = [];
+      if (u === null) return;
+      const cx = Math.round(u * LW / CS), cy = Math.round(v * LH / CS);
+      if (cy <= top0 + 2) return;
+      for (let y = -1; y <= 1; y++) for (let x = -1; x <= 1; x++) { const xx = cx + x, yy = cy + y; if (xx < 1 || yy < 1 || xx > GX - 2 || yy > GY - 2) continue; const i = yy * GX + xx; if (state[i]) continue; rodCells.push(i); cond[i] = 1; phi[i] = 1; }
+    };
+    const uv = e => { const r = cv7.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; };
+    cv7.addEventListener("pointerdown", e => { const p = uv(e); if (p[1] * LH < 132) return; curStroke = [p]; setRod(null); stamp(p[0], p[1], 1); try { cv7.setPointerCapture(e.pointerId); } catch (_) {} });
+    cv7.addEventListener("pointermove", e => {
+      const p = uv(e);
+      if (curStroke) { const q = curStroke[curStroke.length - 1]; if (Math.hypot((p[0] - q[0]) * LW, (p[1] - q[1]) * LH) > 3 && p[1] * LH >= 132) { stampSeg(q, p); curStroke.push(p); } }
+      else if (e.pointerType === "mouse") setRod(p[0], p[1]);
+    });
+    const endStroke = () => { if (curStroke) { strokes.push(curStroke); curStroke = null; bfs(); } };
+    cv7.addEventListener("pointerup", endStroke); cv7.addEventListener("pointercancel", endStroke);
+    cv7.addEventListener("pointerleave", () => setRod(null));
+    for (const bt of lab.querySelectorAll(".mag button")) bt.addEventListener("click", () => {
+      if (bt.dataset.act === "clear") { strokes = []; setRod(null); rasterize(); newBolt(performance.now()); return; }
+      if (bt.dataset.act === "field") { showField = !showField; bt.setAttribute("aria-pressed", showField ? "true" : "false"); return; }
+      P = PRE[bt.dataset.p]; newBolt(performance.now());
+      for (const o2 of lab.querySelectorAll(".mag button[data-p]")) o2.setAttribute("aria-pressed", o2 === bt ? "true" : "false");
+    });
+  }
+
   // ---------- Celestial paintbrush: the cursor paints, and changes with each toy ----------
   {
     const bc = document.getElementById("brush");
@@ -1342,7 +1583,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       b.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     sizeB(); window.addEventListener("resize", sizeB);
-    const ZONES = [["nebula", document.getElementById("heroband")], ["scope", document.getElementById("lab-2")], ["harm", document.getElementById("lab-h")], ["rd", document.getElementById("lab-rd")], ["julia", document.getElementById("lab-j")], ["four", document.getElementById("lab-f")], ["mold", document.getElementById("lab-m")]];
+    const ZONES = [["nebula", document.getElementById("heroband")], ["scope", document.getElementById("lab-2")], ["harm", document.getElementById("lab-h")], ["rd", document.getElementById("lab-rd")], ["julia", document.getElementById("lab-j")], ["four", document.getElementById("lab-f")], ["mold", document.getElementById("lab-m")], ["bolt", document.getElementById("lab-e")]];
     const zoneAt = (x, y) => {
       for (const [z, el] of ZONES) { const r = el.getBoundingClientRect(); if (y >= r.top && y <= r.bottom && x >= r.left && x <= r.right) return z; }
       return "sky";
@@ -1361,6 +1602,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
         parts.push({ k: "spot", x: x + (R() - 0.5) * 8, y: y + (R() - 0.5) * 8, vx: 0, vy: 0, r: 2 + R() * 5, c: pick(dark ? ["#ff9be0", "#f5e0ff", "#9fe8ff"] : ["#3a2380", "#5b1d5e", "#14305f"]), life: 1300 + R() * 900, t: 0 });
       } else if (z === "julia") {
         parts.push({ k: "orbit", cx: x, cy: y, x, y, vx: 0, vy: 0, r: 4 + R() * 14, a: R() * 6.28, w: (R() < 0.5 ? -1 : 1) * (0.03 + R() * 0.05), c: pick(dark ? ["#b48cff", "#ff7ac8", "#ffd38a", "#7ae0ff"] : ["#4a2aa8", "#a0145a", "#8a4a00", "#0b5e86"]), life: 900 + R() * 900, t: 0 });
+      } else if (z === "bolt") {
+        const pts = [[x, y]]; let qx = x, qy = y; for (let s2 = 0; s2 < 3; s2++) { qx += (R() - 0.5) * 9; qy += 3 + R() * 5; pts.push([qx, qy]); }
+        parts.push({ k: "zap", x, y, vx: 0, vy: 0, r: 1, pts, c: dark ? "#d6dcff" : "#2a1d80", life: 260 + R() * 260, t: 0 });
       } else if (z === "mold") {
         parts.push({ k: "spore", x, y, vx: 0, vy: 0, r: 1.4 + R() * 1.2, a: R() * 6.28, c: pick(dark ? ["#f7a8e4", "#c9b6ff", "#cdf3ff"] : ["#3a2380", "#5b3cc4", "#14305f"]), life: 1400 + R() * 900, t: 0 });
       } else if (z === "four") {
@@ -1391,6 +1635,10 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
         b.strokeStyle = dark ? "#ffd38a" : "#8a4a00"; b.lineWidth = 1.5; b.globalAlpha = 0.95; b.beginPath();
         for (let i = 0; i <= 60; i++) { const u = i / 60 * 6.2832, rr2 = 9 * (1 - Math.cos(u)) / 2 + 2; const px = rr2 * Math.cos(u + t * 0.001), py = rr2 * Math.sin(u + t * 0.001); i ? b.lineTo(px, py) : b.moveTo(px, py); }
         b.stroke(); b.fillStyle = b.strokeStyle; b.beginPath(); b.arc(0, 0, 1.6, 0, 6.2832); b.fill();
+      } else if (z === "bolt") {
+        const fl = 0.75 + 0.25 * Math.sin(t * 0.05);
+        b.strokeStyle = dark ? "#e4e8ff" : "#2a1d80"; b.lineWidth = 1.6; b.globalAlpha = fl; b.lineJoin = "round";
+        b.beginPath(); b.moveTo(3, -12); b.lineTo(-3, -1); b.lineTo(3, 1); b.lineTo(-3, 12); b.stroke();
       } else if (z === "mold") {
         const col3 = dark ? "#f7c2ec" : "#3a2380";
         b.strokeStyle = col3; b.fillStyle = col3; b.lineWidth = 1.5; b.globalAlpha = 0.9;
@@ -1442,6 +1690,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
           p.a += p.w; const rr = p.r * (1 - k * 0.85);
           p.x = p.cx + rr * Math.cos(p.a); p.y = p.cy + rr * Math.sin(p.a);
           b.globalAlpha = a; b.fillStyle = p.c; b.beginPath(); b.arc(p.x, p.y, 1.3, 0, 6.2832); b.fill();
+        } else if (p.k === "zap") {
+          b.globalAlpha = a * (Math.random() < 0.25 ? 0.3 : 1); b.strokeStyle = p.c; b.lineWidth = 0.8; b.beginPath();
+          p.pts.forEach((q, k2) => k2 ? b.lineTo(q[0], q[1]) : b.moveTo(q[0], q[1])); b.stroke();
         } else if (p.k === "spore") {
           p.a += (Math.random() - 0.5) * 0.5; p.x += Math.cos(p.a) * 0.35; p.y += Math.sin(p.a) * 0.35;
           b.globalAlpha = a; b.fillStyle = p.c; b.beginPath(); b.arc(p.x, p.y, p.r, 0, 6.2832); b.fill();
@@ -1505,29 +1756,18 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   const tick = () => { clock.textContent = "Satsuma, FL · " + tf.format(new Date()).toLowerCase(); };
   tick(); moon(); setInterval(() => { tick(); moon(); }, 30000);
 
-  // ---------- Wordmark: fit to one row, letters lift near the pointer ----------
-  const nameEl = document.getElementById("name");
-  const letters = [...nameEl.querySelectorAll("span")];
-  const fit = () => {
-    nameEl.style.fontSize = "";
-    const w = nameEl.clientWidth;
-    const fs = parseFloat(getComputedStyle(nameEl).fontSize);
-    const tw = letters[letters.length - 1].getBoundingClientRect().right - letters[0].getBoundingClientRect().left;
-    if (tw > 0) nameEl.style.fontSize = Math.min(400, fs * (w / tw) * 0.99) + "px";
-  };
-  fit();
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
-  const nameRO = new ResizeObserver(fit);
-  nameRO.observe(nameEl.parentElement);
-  if (!reduceMotion) band.addEventListener("pointermove", e => {
-    for (const s of letters) {
-      const r = s.getBoundingClientRect();
-      const dx = Math.abs(e.clientX - (r.left + r.width / 2)), dy = Math.abs(e.clientY - (r.top + r.height / 2));
-      const k = Math.max(0, 1 - dx / 160) * Math.max(0, 1 - dy / 260);
-      s.style.transform = `translateY(${-k * 18}px)`;
-    }
-  });
-  band.addEventListener("pointerleave", () => { for (const s of letters) s.style.transform = ""; });
+  // ---------- Scrollbar: takes the colours of the toy in view ----------
+  {
+    const zs = [["nebula", "heroband"], ["scope", "lab-2"], ["harm", "lab-h"], ["rd", "lab-rd"], ["julia", "lab-j"], ["four", "lab-f"], ["mold", "lab-m"], ["bolt", "lab-e"]].map(([z, id]) => [z, document.getElementById(id)]);
+    let raf = 0;
+    const upd = () => {
+      raf = 0; const mid = innerHeight / 2; let cur = "sky";
+      for (const [z, el] of zs) { const r = el.getBoundingClientRect(); if (r.top <= mid && r.bottom >= mid) { cur = z; break; } }
+      if (root.dataset.zone !== cur) root.dataset.zone = cur;
+    };
+    addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(upd); }, { passive: true });
+    addEventListener("resize", upd); upd();
+  }
 }
 </script>
 </body>
