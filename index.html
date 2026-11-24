@@ -1,230 +1,165 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Camille Taylor</title>
 <meta name="description" content="Camille Taylor. An ongoing experiment in creation and independence, working across art, technology, commerce and local economies.">
-<script>(function(){var t=null;try{t=localStorage.getItem("ct-theme")}catch(e){}document.documentElement.dataset.theme=t||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")})()</script>
+<script>(function(){var t=null;try{t=localStorage.getItem("ct-theme")}catch(e){}document.documentElement.dataset.theme=t||"dark"})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Michroma&family=Sora:wght@300..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* VOICE  personal index: confident, sparse, a little playful
-   IDEA   a printed project index from a studio catalogue; each entry has its own colour plate
-   PICTURE the colour plate: a big flat field per project with its own mark, swapping as you move down the index
-   COLOUR white or near-black ground, ink, and each project's own brand colour as the plate
-   TYPE   Archivo expanded black for the wordmark and names, Inter for text
-   LAYOUT wordmark across the top; index left with plate sticky right; on phones the plate sits above the list */
-:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0f0f0e);--ink:light-dark(#111110,#f1f0ea);--soft:light-dark(#5d5c57,#a9a8a0);--line:light-dark(#dedcd5,#2c2b28);--chip:light-dark(#f3f2ee,#1a1a18)}
-:root[data-theme=light]{color-scheme:light}
-:root[data-theme=dark]{color-scheme:dark}
+/* VOICE  personal index, quiet and a little cosmic
+   IDEA   an observatory plate: a live strange attractor photographed like a nebula, with its equation and readings in the margin
+   PICTURE the Clifford attractor, millions of iterations rendered as light, reshaped by the pointer
+   COLOUR deep space ground with violet, magenta and teal light; light mode is the same plate printed in ink on paper
+   TYPE   Michroma (space-age wide) for the wordmark and labels, Sora for text, Plex Mono for readings
+   LAYOUT wordmark across the plate; a full-width typographic index of projects below; no illustrations */
+:root{color-scheme:dark;--bg:#05060d;--ink:#ecedf7;--soft:#9a9cb5;--line:#1f2234;--chip:#0e1020;--accent:#a98bff}
+:root[data-theme=light]{color-scheme:light;--bg:#f3f2ec;--ink:#14141b;--soft:#5d5c66;--line:#d8d6cc;--chip:#e9e7df;--accent:#4a2fd1}
 *{box-sizing:border-box;min-width:0}
 html{scroll-padding-top:80px;scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+body{margin:0;background:var(--bg);color:var(--ink);font:300 17px/1.6 Sora,system-ui,sans-serif;overflow-x:clip;transition:background-color .4s,color .4s}
+#sky{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+#brush{position:fixed;inset:0;width:100%;height:100%;z-index:60;pointer-events:none}
+html.brushing,html.brushing *{cursor:none!important}
+header,main,footer{position:relative;z-index:1}
+header{position:sticky}
 a{color:inherit}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
 .wrap{max-width:1240px;margin:0 auto;padding-left:max(5vw,16px);padding-right:max(5vw,16px)}
-header{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .bar{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:64px;flex-wrap:wrap}
-.mark{font:900 22px/1 Archivo,sans-serif;font-stretch:125%;letter-spacing:-.02em;text-decoration:none}
+.mark{font:400 17px/1 Michroma,sans-serif;letter-spacing:.02em;text-decoration:none}
 nav{display:flex;gap:18px;align-items:center;font-size:15px}
 nav a{text-decoration:none;padding:10px 0;border-bottom:1px solid transparent}
 nav a:hover,nav a:focus-visible{border-color:currentColor}
-.mode{all:unset;box-sizing:border-box;cursor:pointer;width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--line);border-radius:99px;color:var(--ink);transition:background .2s,border-color .2s}
-.mode:hover{background:var(--chip);border-color:var(--ink)}
+.sky{display:flex;align-items:center;gap:10px;color:var(--soft);font-size:13px;white-space:nowrap}
+.sky svg{width:16px;height:16px;flex:none}
+.mode{all:unset;box-sizing:border-box;cursor:pointer;width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--line);border-radius:99px;color:var(--ink);transition:border-color .2s}
+.mode:hover{border-color:var(--ink)}
 .mode:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .mode svg{width:18px;height:18px}
-.mode .sun{display:none}
-:root[data-theme=dark] .mode .sun{display:block}
-:root[data-theme=dark] .mode .moon{display:none}
-body{transition:background-color .3s,color .3s}
-.clock{color:var(--soft);font-size:14px;white-space:nowrap;font-variant-numeric:tabular-nums}
-.hero{padding-top:clamp(36px,7vw,96px);padding-bottom:clamp(28px,4vw,56px)}
-.name{font:900 clamp(64px,17vw,232px)/.82 Archivo,sans-serif;font-stretch:125%;letter-spacing:-.045em;margin:0}
+.mode .sun{display:block}
+.mode .moon{display:none}
+:root[data-theme=light] .mode .sun{display:none}
+:root[data-theme=light] .mode .moon{display:block}
+.heroband{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+#field{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;cursor:crosshair}
+.hero{position:relative;pointer-events:none;padding-top:clamp(36px,7vw,96px);padding-bottom:clamp(24px,3vw,40px);min-height:min(78svh,760px);display:flex;flex-direction:column;justify-content:space-between;gap:32px}
+.hero a,.hero button{pointer-events:auto}
+.name{font:400 clamp(40px,10vw,400px)/.9 Michroma,sans-serif;letter-spacing:-.01em;margin:0;white-space:nowrap;color:var(--ink)}
 .name span{display:inline-block;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
-.lede{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:32px;margin-top:clamp(24px,3vw,40px);align-items:end}
-.lede h1{font:700 clamp(28px,3.4vw,44px)/1.08 Archivo,sans-serif;font-stretch:100%;letter-spacing:-.02em;margin:0;text-wrap:balance}
-.lede p{margin:0;color:var(--soft);font-size:18px;max-width:34ch}
-.upd{display:block;margin-top:10px;font-size:14px}
+.lede{margin:clamp(12px,2vw,24px) 0 clamp(24px,3vw,36px);color:var(--soft);font:300 clamp(18px,2vw,26px)/1.3 Sora,sans-serif;letter-spacing:.01em;text-shadow:0 0 18px var(--bg)}
+.upd{display:block;margin-top:10px;color:var(--soft);font-size:14px;letter-spacing:0}
+.readout{margin-top:22px}
+.readout{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;font-size:13px;color:var(--soft);border-top:1px solid var(--line);padding-top:14px}
+.readout b{font-weight:500;color:var(--ink)}
+.readout .eq{overflow-wrap:anywhere}
 section{border-top:1px solid var(--ink);padding-top:22px;padding-bottom:clamp(40px,6vw,88px)}
-.label{display:flex;justify-content:space-between;gap:16px;font-size:15px;font-weight:600;margin:0 0 28px}
-.label span{color:var(--soft);font-weight:400}
-.projects{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:start}
+.lab{position:relative;min-height:clamp(360px,72svh,760px)}
+.lab-sm{min-height:clamp(280px,48svh,520px)}
+.lab .tag{position:absolute;right:0;bottom:18px;color:var(--soft);font-size:12px;opacity:.5;letter-spacing:.02em;pointer-events:none}
+#scope{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+#scope.drag{cursor:grabbing}
+.mag{position:absolute;left:50%;transform:translateX(-50%);bottom:56px;display:flex;gap:6px}
+.mag button{all:unset;box-sizing:border-box;cursor:pointer;min-width:52px;height:36px;display:grid;place-items:center;font:12px "IBM Plex Mono",ui-monospace,monospace;color:var(--soft);border:1px solid var(--line);border-radius:99px;background:color-mix(in srgb,var(--bg) 70%,transparent)}
+.mag button[aria-pressed=true]{color:var(--ink);border-color:var(--ink)}
+.mag button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+#nursery{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:crosshair;touch-action:manipulation}
+.lab .hint{position:absolute;left:0;bottom:18px;color:var(--soft);font-size:12px;max-width:60%;pointer-events:none;transition:opacity .4s}
+.label{display:flex;justify-content:space-between;gap:16px;font:400 13px/1.4 Michroma,sans-serif;letter-spacing:.04em;margin:0 0 28px}
+.label span{color:var(--soft);font-weight:400;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px}
 .list{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
 .row{border-bottom:1px solid var(--line)}
-.row button{all:unset;box-sizing:border-box;display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:baseline;width:100%;padding:22px 0;cursor:pointer}
-.row button:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
-.num{color:var(--soft);font-size:14px;font-variant-numeric:tabular-nums}
-.pn{font:800 clamp(24px,2.6vw,34px)/1.05 Archivo,sans-serif;font-stretch:112%;letter-spacing:-.02em;transition:transform .3s}
-.pd{grid-column:2;color:var(--soft);font-size:16px;margin-top:6px}
-.arrow{font-size:22px;opacity:.35;transition:opacity .2s,transform .3s}
-.row.on .pn{transform:translateX(8px)}
-.row.on .arrow{opacity:1;transform:translateX(4px)}
-.row .go{display:none}
-.plate{position:sticky;top:88px;aspect-ratio:6/5;border-radius:4px;overflow:hidden;background:var(--p1);color:var(--p3);transition:background .45s}
-:root[data-theme=dark] .plate{box-shadow:0 0 0 1px var(--line)}
-.plate svg{position:absolute;top:12px;left:0;width:100%;height:calc(100% - 108px)}
-.plate .cap{position:absolute;left:24px;right:24px;bottom:22px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px}
-.plate .t{font:900 clamp(26px,3vw,40px)/1 Archivo,sans-serif;font-stretch:118%;letter-spacing:-.02em;max-width:12ch}
-.plate a{font-size:15px;font-weight:600;text-decoration:none;border:1.5px solid currentColor;border-radius:99px;padding:10px 16px;white-space:nowrap}
-.plate a:hover,.plate a:focus-visible{background:var(--p3);color:var(--p1)}
-.plate .soon{font-size:15px;font-weight:600;white-space:nowrap;opacity:.85}
-.chips{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px;padding:0;list-style:none}
-.chips li{font:700 clamp(20px,2.4vw,30px)/1 Archivo,sans-serif;font-stretch:110%;letter-spacing:-.01em;background:var(--chip);border:1px solid var(--line);border-radius:99px;padding:14px 22px}
-.bg2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,56px)}
-.bg2 p{margin:0 0 14px;max-width:60ch}
-.docs{display:grid;gap:0;border-top:1px solid var(--line)}
-.docs div{display:flex;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--line);font-size:16px}
-.docs span{color:var(--soft)}
-.more{display:inline-block;margin-top:18px;font-weight:600;text-decoration:none;border-bottom:1.5px solid currentColor;padding-bottom:2px}
+.row>a,.row>div{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:16px;align-items:baseline;padding:26px 0;text-decoration:none}
+.row>a:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
+.host{color:var(--soft);font:13px "IBM Plex Mono",ui-monospace,monospace;white-space:nowrap;transition:color .2s}
+.row>a:hover .host,.row>a:focus-visible .host{color:var(--ink)}
+.num{color:var(--soft);font:13px "IBM Plex Mono",ui-monospace,monospace}
+.pn{font:400 clamp(26px,3.4vw,46px)/1.1 Sora,sans-serif;letter-spacing:-.025em;transition:transform .3s;display:inline-block}
+.pd{display:block;color:var(--soft);font-size:16px;margin-top:6px}
+.row>a:hover .pn,.row>a:focus-visible .pn{transform:translateX(10px)}
 .conn{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));border-top:1px solid var(--line)}
-.conn a,.conn div{display:block;padding:24px 20px 26px 0;border-bottom:1px solid var(--line);text-decoration:none}
-.conn b{display:block;font:800 clamp(22px,2.4vw,30px)/1.1 Archivo,sans-serif;font-stretch:110%;letter-spacing:-.015em;margin-bottom:8px}
+.conn a{display:block;padding:24px 20px 26px 0;border-bottom:1px solid var(--line);text-decoration:none}
+.conn b{display:block;font:500 clamp(22px,2.4vw,30px)/1.1 Sora,sans-serif;letter-spacing:-.02em;margin-bottom:8px}
 .conn span{color:var(--soft);font-size:16px;overflow-wrap:anywhere}
 .conn a:hover b,.conn a:focus-visible b{text-decoration:underline;text-underline-offset:5px}
 footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);font-size:14px}
 footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 @media(max-width:860px){
-.projects{grid-template-columns:minmax(0,1fr)}
-.plate{position:relative;top:0;aspect-ratio:auto;height:300px;order:-1}
-.lede,.bg2{grid-template-columns:minmax(0,1fr)}
+.hero{min-height:min(72svh,580px)}
 }
 @media(max-width:600px){
-.clock{display:none}
-.row button{grid-template-columns:32px minmax(0,1fr) auto}
-.plate{height:250px}
-.plate svg{height:calc(100% - 72px)}
-.plate .t{display:none}
-.plate .cap{left:18px;right:18px;bottom:16px;justify-content:flex-end}
+.sky{display:none}
+.row>a,.row>div{grid-template-columns:32px minmax(0,1fr);row-gap:8px}
+.host{grid-column:2}
+.hero{padding-bottom:20px}
+.heroband{min-height:0}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
+<canvas id="sky" aria-hidden="true"></canvas>
+<canvas id="brush" aria-hidden="true"></canvas>
 <header>
   <div class="wrap bar">
     <a class="mark" href="#top" aria-label="Camille Taylor, back to top">CAMILLE.</a>
     <nav aria-label="Sections">
-      <a href="#index">Index</a>
-      <a href="#contact">Contact</a>
-      <span class="clock" id="clock">Satsuma, FL</span>
-      <button class="mode" id="mode" type="button" aria-label="Switch to dark mode"><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" fill="currentColor"/></svg><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg></button>
+      <span class="sky mono" id="skyinfo"><span id="clock">Satsuma, FL</span><svg id="moonic" viewBox="0 0 16 16" aria-hidden="true"></svg><span id="phase"></span></span>
+      <button class="mode" id="mode" type="button" aria-label="Switch to light mode"><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" fill="currentColor"/></svg><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg></button>
     </nav>
   </div>
 </header>
 
 <main id="top">
-  <div class="wrap hero">
-    <p class="name" id="name" aria-label="Camille"><span>C</span><span>A</span><span>M</span><span>I</span><span>L</span><span>L</span><span>E</span><span>.</span></p>
-    <div class="lede">
-      <h1>An ongoing experiment in creation and independence.</h1>
-      <p>Working across art, technology, commerce and local economies.<span class="upd">Camille Taylor · Updated November 2026</span></p>
+  <div class="heroband" id="heroband">
+    <canvas id="field" aria-label="A strange attractor that reshapes as you move the pointer"></canvas>
+    <div class="wrap hero">
+      <div>
+        <h1 class="name" id="name" aria-label="Camille Taylor"><span>C</span><span>A</span><span>M</span><span>I</span><span>L</span><span>L</span><span>E</span><span>.</span></h1>
+        <p class="lede">cami's playground</p>
+      </div>
+      <div>
+        <div class="readout mono">
+          <span class="eq">Clifford attractor · x′ = sin(a·y) + c·cos(a·x) · y′ = sin(b·x) + d·cos(b·y)</span>
+          <span id="params">a <b>−1.70</b> b <b>1.60</b> c <b>1.00</b> d <b>0.70</b></span>
+          <span>Move to reshape · click to jump</span>
+        </div>
+      </div>
     </div>
   </div>
 
   <div class="wrap">
-    <section id="index" aria-labelledby="h-proj">
-      <h2 class="label" id="h-proj">01 / Selected projects <span>4 in progress</span></h2>
-      <div class="projects">
-        <ul class="list" id="list"></ul>
-        <div class="plate" id="plate" aria-live="polite"></div>
-      </div>
-    </section>
+    <!-- LAB SLOT 01: open space for experiments. Put anything inside this div. -->
+    <div class="lab" id="lab-1">
+      <canvas id="nursery" aria-label="Stellar nursery: click to form a star, hold longer for a more massive star"></canvas>
+      <span class="hint mono" id="nhint">Click to form a star · hold longer for more mass</span>
+      <span class="tag mono" aria-hidden="true">Lab · slot 01 · stellar nursery</span>
+    </div>
 
-    <section aria-labelledby="h-bg">
-      <h2 class="label" id="h-bg">02 / Professional background <span>The day job</span></h2>
-      <ul class="chips">
-        <li>SaaS</li><li>Customer Success</li><li>Digital Systems</li><li>Business Operations</li>
-      </ul>
-      <div class="bg2">
-        <div>
-          <p>I help customers adopt software and get real value from it: onboarding new accounts, migrating their data, supporting accounting integrations and keeping communication clear from kickoff to go-live.</p>
-          <p>Most of my work sits where software meets the way a business actually runs, turning messy spreadsheets and habits into systems that work.</p>
-        </div>
-        <div class="docs" aria-label="What I do">
-          <div>Customer onboarding <span>Adoption</span></div>
-          <div>Data migration <span>Imports</span></div>
-          <div>Accounting integration support <span>QuickBooks Online</span></div>
-          <div>Template and workflow builds <span>Configuration</span></div>
-          <div>Customer communications <span>Relationships</span></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="contact" aria-labelledby="h-con">
-      <h2 class="label" id="h-con">03 / Connections <span>Say hello</span></h2>
-      <div class="conn" id="conn"></div>
-    </section>
+    <!-- LAB SLOT 02: microscope. -->
+    <div class="lab" id="lab-2">
+      <canvas id="scope" aria-label="Microscope: drag to move the slide, click to start a cell dividing"></canvas>
+      <div class="mag mono" role="group" aria-label="Magnification"><button type="button" data-m="40">40×</button><button type="button" data-m="100" aria-pressed="true">100×</button><button type="button" data-m="400">400×</button><button type="button" data-m="inf" aria-label="Eternal zoom">∞</button></div>
+      <span class="hint mono" id="shint">Drag to move the slide · click to start a cell dividing</span>
+      <span class="tag mono" aria-hidden="true">Lab · slot 02 · microscope</span>
+    </div>
   </div>
 </main>
 
-<footer>
-  <div class="wrap">
-    <span>© 2026 Camille Taylor</span>
-    <span>Made in Satsuma, Florida</span>
-  </div>
-</footer>
 
 <script>
 {
-  // Fill these in to turn on the email and LinkedIn rows.
-  const CONTACT = { email: "", linkedin: "" };
 
-  const P = [
-    { n: "Small Town Marketing", d: "Digital infrastructure for small businesses.", url: "https://small-town-marketing.com", host: "small-town-marketing.com", c1: "#203F3A", c2: "#C47748", c3: "#F7F4EC", m: "shop" },
-    { n: "CamiCamiRobot", d: "Visual art and creative exploration.", url: "https://camicamirobot.com", host: "camicamirobot.com", c1: "#2EC4C0", c2: "#FF4FA3", c3: "#0B1F2A", m: "robot" },
-    { n: "Putnam Asset Exchange", d: "Exploring stronger local economies.", url: "https://putnamexchange.com", host: "putnamexchange.com", c1: "#003B29", c2: "#F05A0C", c3: "#FFF9E0", m: "grid" },
-    { n: "Garden & Grain", d: "A family experiment in growing and creating.", url: "", host: "", c1: "#F3EBDD", c2: "#C8102E", c3: "#141414", m: "sprout" }
-  ];
 
   const esc = s => String(s).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
-
-  const art = {
-    shop: (a, b, c) => `<rect x="70" y="150" width="260" height="190" fill="${c}" opacity=".1"/><path d="M60 160 L200 70 L340 160 Z" fill="${b}"/><rect x="90" y="160" width="220" height="170" fill="${c}"/><rect x="120" y="200" width="70" height="60" fill="${a}"/><rect x="215" y="200" width="65" height="130" fill="${b}"/><circle cx="268" cy="268" r="5" fill="${c}"/><path d="M90 160 h220 v18 h-220z" fill="${a}" opacity=".35"/>`,
-    robot: (a, b, c) => `<rect x="105" y="95" width="190" height="170" rx="34" fill="${c}"/><circle cx="160" cy="175" r="30" fill="${b}"/><circle cx="240" cy="175" r="30" fill="${a}" stroke="${b}" stroke-width="8"/><circle cx="160" cy="175" r="10" fill="${c}"/><circle cx="240" cy="175" r="10" fill="${c}"/><rect x="160" y="225" width="80" height="12" rx="6" fill="${b}"/><path d="M200 95 V58" stroke="${c}" stroke-width="8"/><circle cx="200" cy="52" r="12" fill="${b}"/><rect x="135" y="265" width="130" height="70" rx="14" fill="${c}" opacity=".9"/>`,
-    grid: (a, b, c) => [0, 1, 2, 3].map(i => [0, 1].map(j => `<rect x="${78 + i * 64}" y="${100 + j * 64}" width="54" height="54" fill="${i === 2 ? b : c}" opacity="${i === 2 ? 1 : .92}"/>`).join("")).join("") + `<path d="M70 300 C140 250 200 330 330 280" stroke="${c}" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M110 70 Q200 30 290 70" stroke="${b}" stroke-width="10" fill="none" stroke-linecap="round"/>`,
-    sprout: (a, b, c) => `<path d="M200 330 V200" stroke="${c}" stroke-width="10" stroke-linecap="round"/><path d="M200 220 C150 220 120 180 120 140 C170 140 200 175 200 220Z" fill="${c}"/><path d="M200 200 C250 200 285 160 285 115 C235 115 200 150 200 200Z" fill="${c}"/><ellipse cx="200" cy="335" rx="90" ry="14" fill="${c}" opacity=".15"/><path d="M178 248 l22 12 l22 -12 l-6 22 h-32z" fill="${b}"/>`
-  };
-
-  const list = document.getElementById("list");
-  const plate = document.getElementById("plate");
-
-  list.innerHTML = P.map((p, i) => `
-    <li class="row" data-i="${i}">
-      <button type="button" aria-controls="plate">
-        <span class="num">0${i + 1}</span>
-        <span><span class="pn">${esc(p.n)}</span><span class="pd" style="display:block">${esc(p.d)}</span></span>
-        <span class="arrow" aria-hidden="true">→</span>
-      </button>
-    </li>`).join("");
-
-  const show = i => {
-    const p = P[i];
-    plate.style.setProperty("--p1", p.c1);
-    plate.style.setProperty("--p3", p.c3);
-    plate.innerHTML = `<svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${art[p.m](p.c1, p.c2, p.c3)}</svg>
-      <div class="cap"><span class="t">${esc(p.n)}</span>${p.url ? `<a href="${esc(p.url)}" aria-label="Visit ${esc(p.host)}">Visit site →</a>` : `<span class="soon">Site coming soon</span>`}</div>`;
-    for (const r of list.children) r.classList.toggle("on", +r.dataset.i === i);
-  };
-
-  list.addEventListener("mouseover", e => { const r = e.target.closest(".row"); if (r) show(+r.dataset.i); });
-  list.addEventListener("focusin", e => { const r = e.target.closest(".row"); if (r) show(+r.dataset.i); });
-  list.addEventListener("click", e => {
-    const r = e.target.closest(".row"); if (!r) return;
-    show(+r.dataset.i);
-    if (window.matchMedia("(max-width:860px)").matches) plate.scrollIntoView({ block: "nearest" });
-  });
-  show(0);
-
-  const rows = [
-    CONTACT.email && { b: "Professional inquiries", s: CONTACT.email, h: "mailto:" + CONTACT.email },
-    { b: "Collaborations", s: "Art, local projects and small business work. Start with a DM on X: @_CamilleTaylor", h: "https://x.com/_CamilleTaylor" },
-    CONTACT.linkedin && { b: "LinkedIn", s: CONTACT.linkedin.replace(/^https?:\/\/(www\.)?/, ""), h: CONTACT.linkedin },
-    { b: "Instagram", s: "@camicamirobot", h: "https://instagram.com/camicamirobot" }
-  ].filter(Boolean);
-  document.getElementById("conn").innerHTML = rows.map(r => `<a href="${esc(r.h)}"><b>${esc(r.b)}</b><span>${esc(r.s)}</span></a>`).join("");
-
   const root = document.documentElement;
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ---------- Theme toggle ----------
   const mode = document.getElementById("mode");
   const label = () => mode.setAttribute("aria-label", root.dataset.theme === "dark" ? "Switch to light mode" : "Switch to dark mode");
   label();
@@ -234,21 +169,1021 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     label();
   });
 
-  const clock = document.getElementById("clock");
-  const fmt = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric", minute: "2-digit" });
-  const tick = () => { clock.textContent = "Satsuma, FL · " + fmt.format(new Date()).toLowerCase(); };
-  tick(); setInterval(tick, 15000);
+  // ---------- Star field: steady stars, fleeting flares and meteors ----------
+  const sky = document.getElementById("sky");
+  const sg = sky.getContext("2d");
+  const STAR = {
+    dark: ["#a9c8ff", "#dbe6ff", "#fff6e6", "#ffd9a0", "#ffa27a", "#ff86cf", "#86f2ea", "#bca4ff"],
+    light: ["#2b4fb3", "#4a3fc2", "#9a5a00", "#c2410c", "#b0185a", "#0f766e", "#6d28d9", "#1e3a8a"]
+  };
+  const sprites = { dark: [], light: [] };
+  const makeSprite = (col, dark, spikes) => {
+    const S = 64, c = document.createElement("canvas"); c.width = c.height = S;
+    const x = c.getContext("2d"), m = S / 2;
+    // soft starlight falloff, tight and fast like a real point source
+    const gr = x.createRadialGradient(m, m, 0, m, m, m);
+    gr.addColorStop(0, dark ? "#ffffff" : col);
+    gr.addColorStop(0.06, col);
+    gr.addColorStop(0.18, col + (dark ? "55" : "33"));
+    gr.addColorStop(0.45, col + (dark ? "14" : "0a"));
+    gr.addColorStop(1, col + "00");
+    x.fillStyle = gr; x.fillRect(0, 0, S, S);
+    if (spikes) {
+      // four-point diffraction spikes, as in telescope photos
+      for (const [dx, dy] of [[1, 0], [0, 1]]) {
+        const lg = x.createLinearGradient(m - dx * m, m - dy * m, m + dx * m, m + dy * m);
+        lg.addColorStop(0, col + "00"); lg.addColorStop(0.5, dark ? col + "dd" : col + "99"); lg.addColorStop(1, col + "00");
+        x.fillStyle = lg;
+        if (dx) x.fillRect(0, m - 0.6, S, 1.2); else x.fillRect(m - 0.6, 0, 1.2, S);
+      }
+    }
+    return c;
+  };
+  for (const th of ["dark", "light"]) STAR[th].forEach(col => sprites[th].push([makeSprite(col, th === "dark", false), makeSprite(col, th === "dark", true)]));
 
-  const letters = [...document.querySelectorAll("#name span")];
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (!reduce) document.getElementById("name").addEventListener("pointermove", e => {
+  let SW = 0, SH = 0, field = [], flares = [], meteors = [], nextSpawn = 0, sseed = 23, skyLast = 0;
+  const srnd = () => (sseed = sseed * 16807 % 2147483647) / 2147483647;
+  const sizeSky = () => {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    SW = window.innerWidth; SH = window.innerHeight;
+    sky.width = Math.round(SW * dpr); sky.height = Math.round(SH * dpr);
+    sg.setTransform(dpr, 0, 0, dpr, 0, 0);
+    sseed = 23; field = [];
+    const n = Math.round(SW * SH / 4000);
+    for (let i = 0; i < n; i++) {
+      const big = srnd() < 0.08;
+      field.push({ x: srnd() * SW, y: srnd() * SH, c: (srnd() * 8) | 0, s: big ? 14 + srnd() * 10 : 3 + srnd() * 5, sp: big, a: 0.35 + srnd() * 0.6, ph: srnd() * 6.28, f: 0.3 + srnd() * 1.4 });
+    }
+  };
+  const spawn = t => {
+    if (Math.random() < 0.55) {
+      flares.push({ x: Math.random() * SW, y: Math.random() * SH, c: (Math.random() * 8) | 0, s: 18 + Math.random() * 22, t0: t, life: 1800 + Math.random() * 1600 });
+    } else {
+      const ang = (Math.random() < 0.5 ? 0.35 : Math.PI - 0.35) + (Math.random() - 0.5) * 0.5;
+      meteors.push({ x: Math.random() * SW, y: Math.random() * SH * 0.6, vx: Math.cos(ang), vy: Math.sin(ang), v: 0.5 + Math.random() * 0.5, len: 90 + Math.random() * 130, c: (Math.random() * 8) | 0, t0: t, life: 700 + Math.random() * 600 });
+    }
+    nextSpawn = t + 900 + Math.random() * 2200;
+  };
+  const drawSky = t => {
+    const th = root.dataset.theme === "light" ? "light" : "dark";
+    const spr = sprites[th], cols = STAR[th];
+    sg.clearRect(0, 0, SW, SH);
+    sg.globalCompositeOperation = th === "dark" ? "lighter" : "source-over";
+    const dim = th === "dark" ? 1 : 0.55;
+    for (const st of field) {
+      const tw = reduceMotion ? 1 : 0.6 + 0.4 * Math.sin(t * 0.0012 * st.f + st.ph) * Math.sin(t * 0.0007 * st.f + st.ph * 2);
+      sg.globalAlpha = st.a * tw * dim;
+      sg.drawImage(spr[st.c][st.sp ? 1 : 0], st.x - st.s / 2, st.y - st.s / 2, st.s, st.s);
+    }
+    if (!reduceMotion) {
+      if (t > nextSpawn) spawn(t);
+      flares = flares.filter(f => t - f.t0 < f.life);
+      for (const f of flares) {
+        const k = (t - f.t0) / f.life, e = k < 0.3 ? k / 0.3 : Math.pow(1 - (k - 0.3) / 0.7, 1.6);
+        const sz = f.s * (0.5 + 0.7 * e);
+        sg.globalAlpha = e * dim;
+        sg.drawImage(spr[f.c][1], f.x - sz / 2, f.y - sz / 2, sz, sz);
+      }
+      meteors = meteors.filter(m => t - m.t0 < m.life);
+      sg.lineCap = "round";
+      for (const m of meteors) {
+        const k = (t - m.t0) / m.life, e = Math.sin(Math.PI * k);
+        const d = (t - m.t0) * m.v, hx = m.x + m.vx * d, hy = m.y + m.vy * d;
+        const tx2 = hx - m.vx * m.len * (0.4 + 0.6 * k), ty2 = hy - m.vy * m.len * (0.4 + 0.6 * k);
+        const lg = sg.createLinearGradient(hx, hy, tx2, ty2);
+        lg.addColorStop(0, cols[m.c]); lg.addColorStop(1, cols[m.c] + "00");
+        sg.globalAlpha = e * dim; sg.strokeStyle = lg; sg.lineWidth = 1.4;
+        sg.beginPath(); sg.moveTo(hx, hy); sg.lineTo(tx2, ty2); sg.stroke();
+        sg.drawImage(spr[m.c][0], hx - 7, hy - 7, 14, 14);
+      }
+    }
+    sg.globalAlpha = 1; sg.globalCompositeOperation = "source-over";
+  };
+  const skyLoop = t => { if (t - skyLast > 30) { skyLast = t; drawSky(t); } requestAnimationFrame(skyLoop); };
+  sizeSky();
+  window.addEventListener("resize", () => { sizeSky(); if (reduceMotion) drawSky(0); });
+  if (reduceMotion) drawSky(0); else requestAnimationFrame(skyLoop);
+  new MutationObserver(() => { if (reduceMotion) drawSky(0); }).observe(root, { attributes: true, attributeFilter: ["data-theme"] });
+
+  // ---------- Strange attractor nebula ----------
+  const band = document.getElementById("heroband");
+  const cv = document.getElementById("field");
+  const g = cv.getContext("2d");
+  const off = document.createElement("canvas");
+  const og = off.getContext("2d");
+  const paramsEl = document.getElementById("params");
+  const PRESETS = [[-1.7, 1.6, 1.0, 0.7], [-1.4, 1.6, 1.0, 0.7], [1.7, 1.7, 0.06, 1.2], [-1.8, -2.0, -0.5, -0.9], [1.5, -1.8, 1.6, 0.9], [-1.24, -1.25, -1.81, -1.91]];
+  let pi = 0, prm = PRESETS[0].slice(), base = PRESETS[0].slice();
+  let W = 0, H = 0, BW = 0, BH = 0, hist = null, img = null, stars = [], seed = 11;
+  let px = 0.5, py = 0.5, tpx = 0.5, tpy = 0.5, lastMove = -1e9, running = true, wx = 0.1, wy = 0.1, fade = 0;
+  const rnd = () => (seed = seed * 16807 % 2147483647) / 2147483647;
+
+  const lut = { dark: [0, 1, 2, 3, 4].map(() => new Uint8ClampedArray(256 * 4)), light: new Uint8ClampedArray(256 * 4) };
+  let tint = 0;
+  const ramp = (arr, stops) => {
+    for (let i = 0; i < 256; i++) {
+      const t = i / 255;
+      let k = 0; while (k < stops.length - 2 && t > stops[k + 1][0]) k++;
+      const [t0, c0] = stops[k], [t1, c1] = stops[k + 1];
+      const f = Math.min(1, Math.max(0, (t - t0) / (t1 - t0)));
+      for (let j = 0; j < 4; j++) arr[i * 4 + j] = c0[j] + (c1[j] - c0[j]) * f;
+    }
+  };
+  ramp(lut.dark[0], [[0, [60, 40, 170, 0]], [0.3, [106, 76, 255, 55]], [0.55, [214, 79, 190, 115]], [0.8, [80, 214, 220, 175]], [1, [240, 244, 255, 230]]]);
+  ramp(lut.dark[1], [[0, [20, 60, 120, 0]], [0.3, [40, 110, 230, 60]], [0.6, [50, 200, 215, 130]], [0.85, [150, 245, 235, 185]], [1, [240, 255, 252, 230]]]);
+  ramp(lut.dark[2], [[0, [120, 40, 40, 0]], [0.3, [200, 70, 60, 60]], [0.6, [240, 150, 70, 130]], [0.85, [255, 215, 140, 185]], [1, [255, 248, 230, 230]]]);
+  ramp(lut.dark[3], [[0, [20, 80, 60, 0]], [0.3, [30, 140, 110, 60]], [0.6, [110, 215, 130, 130]], [0.85, [210, 240, 150, 185]], [1, [245, 255, 235, 230]]]);
+  ramp(lut.dark[4], [[0, [90, 30, 120, 0]], [0.3, [180, 60, 200, 60]], [0.6, [255, 100, 190, 130]], [0.85, [120, 230, 240, 185]], [1, [255, 240, 252, 230]]]);
+  ramp(lut.light, [[0, [74, 47, 209, 0]], [0.35, [74, 47, 209, 55]], [0.7, [140, 30, 120, 120]], [1, [20, 20, 40, 210]]]);
+
+  const build = () => {
+    const r = band.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = r.width; H = r.height;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const s = W < 700 ? 0.6 : 0.5;
+    BW = Math.max(200, Math.round(W * s)); BH = Math.max(160, Math.round(H * s));
+    off.width = BW; off.height = BH;
+    hist = new Float32Array(BW * BH); img = og.createImageData(BW, BH);
+    seed = 11; stars = [];
+    const n = Math.round(W * H / 2600);
+    for (let i = 0; i < n; i++) stars.push({ x: rnd() * W, y: rnd() * H, r: rnd() < 0.08 ? 1.3 : 0.7, a: 0.25 + rnd() * 0.6, ph: rnd() * 6.28, sp: 0.4 + rnd() * 1.2 });
+  };
+
+  const fmt = v => (v < 0 ? "−" : "") + Math.abs(v).toFixed(2);
+  let lastReadout = 0;
+  const step = (t, iters) => {
+    // parameters drift with time and follow the pointer
+    const tt = t * 0.00004;
+    const target = [
+      base[0] + (px - 0.5) * 0.5 + Math.sin(tt * 3.1) * 0.06,
+      base[1] + (py - 0.5) * 0.5 + Math.cos(tt * 2.3) * 0.06,
+      base[2] + Math.sin(tt * 1.7) * 0.08,
+      base[3] + Math.cos(tt * 1.9) * 0.08
+    ];
+    let moved = 0;
+    for (let i = 0; i < 4; i++) { const d = (target[i] - prm[i]) * 0.06; prm[i] += d; moved += Math.abs(d); }
+    const decay = Math.max(0.84, 0.975 - moved * 6 - fade);
+    fade *= 0.9;
+    for (let i = 0; i < hist.length; i++) hist[i] *= decay;
+    const [a, b, c, d] = prm;
+    const sx = 1 + Math.abs(c), sy = 1 + Math.abs(d);
+    const k = BW / W, phone = W < 700;
+    const R = phone ? Math.min(BW * 0.4, 128 * k) : Math.min(BW * 0.32, BH * 0.38);
+    const scale = Math.min(R / sx, R / sy);
+    const cx = BW * (phone ? 0.5 : 0.66), cy = phone ? BH * 0.36 : BH * 0.42;
+    let x = wx, y = wy;
+    for (let i = 0; i < iters; i++) {
+      const nx = Math.sin(a * y) + c * Math.cos(a * x);
+      const ny = Math.sin(b * x) + d * Math.cos(b * y);
+      x = nx; y = ny;
+      const ix = (cx + x * scale) | 0, iy = (cy + y * scale) | 0;
+      if (ix >= 0 && ix < BW && iy >= 0 && iy < BH) hist[iy * BW + ix] += 1;
+    }
+    wx = x; wy = y;
+    if (t - lastReadout > 120) {
+      lastReadout = t;
+      paramsEl.innerHTML = `a <b>${fmt(a)}</b> b <b>${fmt(b)}</b> c <b>${fmt(c)}</b> d <b>${fmt(d)}</b>`;
+    }
+  };
+
+  const render = t => {
+    const dark = root.dataset.theme !== "light";
+    const L = dark ? lut.dark[tint] : lut.light;
+    let max = 1;
+    for (let i = 0; i < hist.length; i += 7) if (hist[i] > max) max = hist[i];
+    const lm = Math.log(1 + max * 0.6);
+    const data = img.data;
+    for (let i = 0, j = 0; i < hist.length; i++, j += 4) {
+      const h = hist[i];
+      if (h < 0.05) { data[j + 3] = 0; continue; }
+      const k = Math.min(255, (Math.pow(Math.log(1 + h) / lm, 1.45) * 255) | 0) * 4;
+      data[j] = L[k]; data[j + 1] = L[k + 1]; data[j + 2] = L[k + 2]; data[j + 3] = L[k + 3];
+    }
+    og.putImageData(img, 0, 0);
+    g.clearRect(0, 0, W, H);
+    // nebula haze
+    if (dark) {
+      const clouds = [[0.62, 0.45, 0.42, "106,76,255", 0.16], [0.78, 0.6, 0.3, "233,79,170", 0.1], [0.45, 0.3, 0.28, "70,214,210", 0.07]];
+      for (const [x, y, r, col, al] of clouds) {
+        const ox = Math.sin(t * 0.00007 + x * 9) * W * 0.03, oy = Math.cos(t * 0.00006 + y * 7) * H * 0.04;
+        const gr = g.createRadialGradient(W * x + ox, H * y + oy, 0, W * x + ox, H * y + oy, Math.max(W, H) * r);
+        gr.addColorStop(0, `rgba(${col},${al})`); gr.addColorStop(1, `rgba(${col},0)`);
+        g.fillStyle = gr; g.fillRect(0, 0, W, H);
+      }
+    }
+    // attractor: soft haze pass then fine filament pass
+    g.imageSmoothingEnabled = true;
+    if (dark) { g.globalCompositeOperation = "lighter"; g.filter = "blur(8px)"; g.globalAlpha = 0.4; g.drawImage(off, 0, 0, W, H); g.filter = "none"; g.globalAlpha = 1; }
+    g.drawImage(off, 0, 0, W, H);
+    // fade the lower part so the text stays readable
+    g.globalCompositeOperation = "destination-out";
+    const fy0 = W < 700 ? H * 0.5 : H * 0.56;
+    const mg = g.createLinearGradient(0, fy0, 0, H);
+    mg.addColorStop(0, "rgba(0,0,0,0)"); mg.addColorStop(W < 700 ? 0.12 : 0.55, "rgba(0,0,0,.85)"); mg.addColorStop(1, "rgba(0,0,0,.95)");
+    g.fillStyle = mg; g.fillRect(0, fy0, W, H - fy0);
+    g.globalCompositeOperation = "source-over";
+
+  };
+
+  const iters = () => (W < 700 ? 22000 : 55000);
+  const loop = t => {
+    if (!running) return;
+    if (performance.now() - lastMove > 3000) { tpx = 0.5 + Math.sin(t * 0.00011) * 0.35; tpy = 0.5 + Math.cos(t * 0.00009) * 0.35; }
+    px += (tpx - px) * 0.04; py += (tpy - py) * 0.04;
+    step(t, iters());
+    render(t);
+    requestAnimationFrame(loop);
+  };
+
+  const setPointer = e => { const r = band.getBoundingClientRect(); tpx = (e.clientX - r.left) / r.width; tpy = (e.clientY - r.top) / r.height; lastMove = performance.now(); };
+  band.addEventListener("pointermove", setPointer);
+  cv.addEventListener("pointerdown", e => { setPointer(e); pi = (pi + 1) % PRESETS.length; base = PRESETS[pi].slice(); fade = 0.12; });
+
+  build();
+  const fieldRO = new ResizeObserver(() => { build(); if (reduceMotion) { for (let i = 0; i < 8; i++) step(0, 60000); render(0); } });
+  fieldRO.observe(band);
+  if (reduceMotion) { for (let i = 0; i < 8; i++) step(0, 60000); render(0); }
+  else {
+    for (let i = 0; i < 6; i++) step(0, 40000);
+    requestAnimationFrame(loop);
+    const fieldIO = new IntersectionObserver(es => {
+      const vis = es[0].isIntersecting;
+      if (vis && !running) { running = true; requestAnimationFrame(loop); }
+      if (!vis) running = false;
+    });
+    fieldIO.observe(band);
+  }
+  new MutationObserver(() => { if (reduceMotion) render(0); }).observe(root, { attributes: true, attributeFilter: ["data-theme"] });
+
+  // ---------- Lab slot 01: stellar nursery ----------
+  {
+    const lab = document.getElementById("lab-1");
+    const nc = document.getElementById("nursery");
+    const n = nc.getContext("2d");
+    const hint = document.getElementById("nhint");
+    let NW = 0, NH = 0, born = [], hold = null, active = false;
+    const sizeN = () => {
+      const r = lab.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
+      NW = r.width; NH = r.height;
+      nc.width = Math.round(NW * dpr); nc.height = Math.round(NH * dpr);
+      n.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    sizeN();
+    const nRO = new ResizeObserver(sizeN); nRO.observe(lab);
+
+    const tempCol = m => m < 0.8 ? "#ff9a5c" : m < 1.6 ? "#fff0c4" : m < 3 ? "#f6f8ff" : m < 8 ? "#d4e3ff" : "#a8c6ff";
+    const years = m => {
+      const y = 1e10 * Math.pow(m, -2.5);
+      return y >= 1e9 ? (y / 1e9).toFixed(y < 1e10 ? 1 : 0) + " billion yrs" : (y / 1e6).toFixed(y < 1e7 ? 1 : 0) + " million yrs";
+    };
+    const massFrom = ms => Math.min(40, 1 + Math.pow(Math.max(0, ms) / 1000, 1.6) * 7);
+    const fmtM = m => m.toFixed(m < 10 ? 1 : 0) + " M☉";
+
+    const glow = (x, y, r, col, a) => {
+      if (r <= 0 || a <= 0) return;
+      const gr = n.createRadialGradient(x, y, 0, x, y, r);
+      gr.addColorStop(0, "rgba(255,255,255," + a + ")");
+      gr.addColorStop(0.12, col);
+      gr.addColorStop(0.35, col + "44");
+      gr.addColorStop(1, col + "00");
+      n.globalAlpha = Math.min(1, a); n.fillStyle = gr;
+      n.beginPath(); n.arc(x, y, r, 0, 6.2832); n.fill(); n.globalAlpha = 1;
+    };
+    const ring = (count, sp0, sp1, cols) => Array.from({ length: count }, () => {
+      const a = Math.random() * 6.2832, v = sp0 + Math.random() * (sp1 - sp0);
+      return { vx: Math.cos(a) * v, vy: Math.sin(a) * v, c: cols[(Math.random() * cols.length) | 0], s: 0.6 + Math.random() * 1.4 };
+    });
+
+    const birth = (x, y, m) => {
+      const high = m >= 8;
+      const ms = Math.max(1600, 4200 * Math.pow(m, -0.35));
+      const ph = high
+        ? [["Collapsing cloud", 1500], ["Ignition", 300], ["Main sequence", ms], ["Red supergiant", 2000], ["Supernova", 2600], [m >= 20 ? "Black hole" : "Neutron star", 5200]]
+        : [["Collapsing cloud", 1600], ["Ignition", 300], ["Main sequence", ms], ["Red giant", 2400], ["Planetary nebula", 3400], ["White dwarf", 4200]];
+      const dust = Array.from({ length: 90 }, () => ({ a: Math.random() * 6.2832, r: 30 + Math.random() * (40 + m * 3), w: 0.002 + Math.random() * 0.003, c: Math.random() < 0.5 ? "#c48bff" : "#ff8fb0" }));
+      born.push({ x, y, m, t0: performance.now(), ph, dust, shell: high ? ring(220, 0.12, 0.34, ["#ffffff", "#ffd38a", "#ff7ac8", "#86f2ea", "#a98bff", "#ff8a3d"]) : ring(150, 0.018, 0.04, ["#58e0d8", "#ff6fb5", "#a98bff"]), spin: Math.random() * 6.28 });
+      hint.textContent = `Forming a ${fmtM(m)} star…`;
+      if (!active) { active = true; requestAnimationFrame(frame); }
+    };
+
+    const drawStar = (st, now, dark) => {
+      let t = now - st.t0, i = 0;
+      while (i < st.ph.length && t > st.ph[i][1]) { t -= st.ph[i][1]; i++; }
+      if (i >= st.ph.length) return false;
+      const [name, dur] = st.ph[i], k = t / dur, m = st.m, x = st.x, y = st.y;
+      const col = tempCol(m), size = 7 + Math.cbrt(m) * 6;
+      const high = m >= 8;
+      let label = name;
+      if (name === "Collapsing cloud") {
+        for (const d of st.dust) {
+          const r = d.r * (1 - k * 0.92), a = d.a + k * 6 * (40 / (d.r + 10));
+          n.globalAlpha = 0.35 + 0.5 * k; n.fillStyle = d.c;
+          n.fillRect(x + Math.cos(a) * r, y + Math.sin(a) * r * 0.8, 1.4, 1.4);
+        }
+        n.globalAlpha = 1;
+        glow(x, y, 6 + k * size, "#ff8a5c", 0.15 + k * 0.4);
+        label = `Protostar · ${fmtM(m)}`;
+      } else if (name === "Ignition") {
+        glow(x, y, size * (1 + 3 * Math.sin(Math.PI * k)), col, 1);
+        label = "Fusion ignites";
+      } else if (name === "Main sequence") {
+        glow(x, y, size * 1.6 * (1 + 0.04 * Math.sin(now * 0.004)), col, 0.95);
+        label = `Main sequence · ${fmtM(m)} · burns ~${years(m)}`;
+      } else if (name === "Red giant" || name === "Red supergiant") {
+        const grow = 1 + k * (high ? 5 : 3.5);
+        const c2 = k < 0.4 ? "#ffb070" : "#ff6a3d";
+        glow(x, y, size * 1.6 * grow * (1 + 0.05 * Math.sin(now * 0.006)), c2, 0.75 - k * 0.15);
+        label = high ? "Red supergiant · core fusing iron" : "Red giant · outer layers swelling";
+      } else if (name === "Supernova") {
+        glow(x, y, 40 + k * 260, "#ffffff", Math.max(0, 1 - k * 1.4));
+        for (const p of st.shell) {
+          n.globalAlpha = Math.max(0, 1 - k); n.fillStyle = p.c;
+          n.fillRect(x + p.vx * t, y + p.vy * t, p.s + 0.6, p.s + 0.6);
+        }
+        n.globalAlpha = 1;
+        label = "Supernova · outshines its galaxy";
+      } else if (name === "Planetary nebula") {
+        for (const p of st.shell) {
+          n.globalAlpha = Math.max(0, 0.9 - k * 0.8); n.fillStyle = p.c;
+          n.fillRect(x + p.vx * (t + 600), y + p.vy * (t + 600), p.s, p.s);
+        }
+        n.globalAlpha = 1;
+        glow(x, y, size * (1.4 - k), "#e8f0ff", 0.9);
+        label = "Planetary nebula · shedding its shell";
+      } else if (name === "White dwarf") {
+        glow(x, y, 9, "#dfe9ff", 1 - k);
+        label = "White dwarf · cooling for billions of years";
+      } else if (name === "Neutron star") {
+        const a = st.spin + now * 0.012;
+        n.globalAlpha = (1 - k) * 0.7; n.strokeStyle = "#bfe0ff"; n.lineWidth = 1;
+        n.beginPath(); n.moveTo(x - Math.cos(a) * 60, y - Math.sin(a) * 60); n.lineTo(x + Math.cos(a) * 60, y + Math.sin(a) * 60); n.stroke();
+        n.globalAlpha = 1;
+        glow(x, y, 10, "#cfe6ff", 1 - k);
+        label = "Neutron star · pulsar spinning ~100 times a second";
+      } else if (name === "Black hole") {
+        n.globalAlpha = (1 - k);
+        const gr = n.createRadialGradient(x, y, 9, x, y, 26);
+        gr.addColorStop(0, "#ffb35c"); gr.addColorStop(0.3, "#ff6a3d88"); gr.addColorStop(1, "#ff6a3d00");
+        n.fillStyle = gr; n.beginPath(); n.ellipse(x, y, 26, 9, -0.3, 0, 6.2832); n.fill();
+        n.globalCompositeOperation = "source-over";
+        n.fillStyle = dark ? "#05060d" : "#f3f2ec"; n.beginPath(); n.arc(x, y, 8, 0, 6.2832); n.fill();
+        n.globalCompositeOperation = dark ? "lighter" : "source-over";
+        n.globalAlpha = 1;
+        label = "Black hole · not even light escapes";
+      }
+      n.globalCompositeOperation = "source-over";
+      n.globalAlpha = Math.min(1, (1 - (i === st.ph.length - 1 ? k : 0)) * 0.85);
+      n.fillStyle = getComputedStyle(root).getPropertyValue("--soft");
+      n.font = "11px 'IBM Plex Mono', monospace";
+      const lx = x + 22 + n.measureText(label).width > NW ? x - 22 - n.measureText(label).width : x + 22;
+      n.fillText(label, lx, y - 16);
+      n.globalAlpha = 1;
+      n.globalCompositeOperation = dark ? "lighter" : "source-over";
+      return true;
+    };
+
+    const frame = now => {
+      const dark = root.dataset.theme !== "light";
+      n.clearRect(0, 0, NW, NH);
+      n.globalCompositeOperation = dark ? "lighter" : "source-over";
+      born = born.filter(st => {
+        const alive = drawStar(st, now, dark);
+        if (!alive) hint.textContent = `Last star: ${fmtM(st.m)} → ${st.ph[st.ph.length - 1][0].toLowerCase()} · click to form another`;
+        return alive;
+      });
+      if (hold) {
+        const m = massFrom(now - hold.t);
+        glow(hold.x, hold.y, 10 + Math.cbrt(m) * 10, "#c48bff", 0.25 + Math.min(0.5, m / 40));
+        n.globalCompositeOperation = "source-over";
+        n.fillStyle = getComputedStyle(root).getPropertyValue("--soft"); n.font = "11px 'IBM Plex Mono', monospace";
+        n.fillText(`${fmtM(m)}${m >= 20 ? " · black hole bound" : m >= 8 ? " · will go supernova" : ""}`, hold.x + 18, hold.y - 16);
+      }
+      n.globalCompositeOperation = "source-over";
+      if (born.length || hold) requestAnimationFrame(frame); else active = false;
+    };
+
+    const pos = e => { const r = nc.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+    nc.addEventListener("pointerdown", e => {
+      const p = pos(e); hold = { x: p.x, y: p.y, t: performance.now() };
+      try { nc.setPointerCapture(e.pointerId); } catch (_) {}
+      if (!active) { active = true; requestAnimationFrame(frame); }
+    });
+    const release = () => { if (!hold) return; const m = massFrom(performance.now() - hold.t); birth(hold.x, hold.y, m); hold = null; };
+    nc.addEventListener("pointerup", release);
+    nc.addEventListener("pointercancel", () => { hold = null; });
+  }
+
+  // ---------- Lab slot 02: microscope ----------
+  {
+    const lab = document.getElementById("lab-2");
+    const sc = document.getElementById("scope");
+    const c = sc.getContext("2d");
+    const hint = document.getElementById("shint");
+    const FOV = { 40: 4500, 100: 1800, 400: 450 }; // field of view in µm (field number 18)
+    let MW = 0, MH = 0, LR = 0, LX = 0, LY = 0, mag = 100, ppu = 1, vx = 0, vy = 0, tpp = 1;
+    let mseed = 101; const mr = () => (mseed = mseed * 16807 % 2147483647) / 2147483647;
+    const sizeM = () => {
+      const r = lab.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
+      MW = r.width; MH = r.height;
+      sc.width = Math.round(MW * dpr); sc.height = Math.round(MH * dpr);
+      c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      LR = Math.min(MW * 0.46, (MH - 130) / 2, 330); LX = MW / 2; LY = 40 + LR;
+      tpp = (2 * LR) / FOV[mag];
+    };
+    sizeM(); ppu = tpp;
+    const mRO = new ResizeObserver(sizeM); mRO.observe(lab);
+
+    // the slide: real organisms at real sizes (µm)
+    const life = [];
+    for (let i = 0; i < 260; i++) life.push({ k: "bac", x: (mr() - 0.5) * 1300, y: (mr() - 0.5) * 1300, a: mr() * 6.28, L: 2 + mr() * 3 });
+    for (let i = 0; i < 34; i++) life.push({ k: mr() < 0.6 ? "cdia" : "pdia", x: (mr() - 0.5) * 2600, y: (mr() - 0.5) * 2600, a: mr() * 6.28, r: 15 + mr() * 35, n: 18 + ((mr() * 16) | 0) });
+    for (let i = 0; i < 9; i++) life.push({ k: "para", x: (mr() - 0.5) * 3200, y: (mr() - 0.5) * 3200, a: mr() * 6.28, L: 180 + mr() * 60, ph: mr() * 6.28 });
+    for (let i = 0; i < 6; i++) life.push({ k: "volv", x: (mr() - 0.5) * 3600, y: (mr() - 0.5) * 3600, a: mr() * 6.28, r: 160 + mr() * 120, d: 2 + ((mr() * 3) | 0), ph: mr() * 6.28 });
+    life.push({ k: "para", x: 140, y: -90, a: 2.6, L: 220, ph: 1 });
+    const cells = [];
+    const NAMES = { bac: "Bacillus · rod bacterium · ~3 µm", cdia: "Centric diatom · glass shell · ", pdia: "Pennate diatom · glass shell · ", para: "Paramecium caudatum · ~", volv: "Volvox colony · ~", cell: "Dividing cell · ~60 µm" };
+
+    const col = dark => dark
+      ? { bg0: "#0b1517", bg1: "#020405", rim: "rgba(205,245,238,.9)", soft: "rgba(140,220,210,.12)", gold: "#f4cf72", green: "#86e39a", pale: "#cfeef0", dot: "rgba(255,255,255,.85)" }
+      : { bg0: "#f7f3e6", bg1: "#d8cfb6", rim: "rgba(40,70,75,.85)", soft: "rgba(60,110,110,.10)", gold: "#8a6414", green: "#2f7d3a", pale: "#3c5a66", dot: "rgba(30,40,40,.8)" };
+
+    const P = (x, y) => [LX + (x - vx) * ppu, LY + (y - vy) * ppu];
+
+    const drawLife = (t, dark, K) => {
+      const lw = Math.max(0.6, Math.min(1.6, ppu * 1.2));
+      c.lineWidth = lw;
+      for (const o of life) {
+        if (!reduceMotion) {
+          if (o.k === "bac") { o.x += (Math.random() - 0.5) * 0.9; o.y += (Math.random() - 0.5) * 0.9; o.a += (Math.random() - 0.5) * 0.2; }
+          else if (o.k === "para") { o.a += Math.sin(t * 0.0004 + o.ph) * 0.004; o.x += Math.cos(o.a) * 0.9; o.y += Math.sin(o.a) * 0.9; if (Math.hypot(o.x, o.y) > 2200) o.a += Math.PI; }
+          else if (o.k === "volv") { o.x += Math.cos(o.a) * 0.18; o.y += Math.sin(o.a) * 0.18; o.ph += 0.004; if (Math.hypot(o.x, o.y) > 2400) o.a += Math.PI; }
+          else { o.a += 0.0008; o.x += Math.cos(o.a * 3) * 0.04; }
+        }
+        const [px, py] = P(o.x, o.y);
+        const ext = (o.r || o.L || 5) * ppu + 20;
+        if (Math.hypot(px - LX, py - LY) > LR + ext) continue;
+        c.save(); c.translate(px, py); c.rotate(o.a);
+        if (o.k === "bac") {
+          const L = o.L * ppu, w = Math.max(0.8, 1 * ppu);
+          c.strokeStyle = K.rim; c.lineWidth = w; c.lineCap = "round";
+          c.beginPath(); c.moveTo(-L / 2, 0); c.lineTo(L / 2, 0); c.stroke();
+        } else if (o.k === "cdia") {
+          const r = o.r * ppu;
+          c.strokeStyle = K.gold; c.fillStyle = K.soft;
+          c.beginPath(); c.arc(0, 0, r, 0, 6.2832); c.fill(); c.stroke();
+          if (r > 6) {
+            c.globalAlpha = 0.6; c.beginPath();
+            for (let i = 0; i < o.n; i++) { const a = i / o.n * 6.2832; c.moveTo(Math.cos(a) * r * 0.25, Math.sin(a) * r * 0.25); c.lineTo(Math.cos(a) * r * 0.95, Math.sin(a) * r * 0.95); }
+            c.stroke();
+            c.beginPath(); c.arc(0, 0, r * 0.62, 0, 6.2832); c.arc(0, 0, r * 0.25, 0, 6.2832); c.stroke(); c.globalAlpha = 1;
+          }
+        } else if (o.k === "pdia") {
+          const L = o.r * 2.4 * ppu, w = o.r * 0.5 * ppu;
+          c.strokeStyle = K.gold; c.fillStyle = K.soft;
+          c.beginPath(); c.ellipse(0, 0, L / 2, w / 2, 0, 0, 6.2832); c.fill(); c.stroke();
+          if (L > 12) {
+            c.globalAlpha = 0.55; c.beginPath();
+            for (let i = -o.n / 2; i <= o.n / 2; i++) { const x = i / (o.n / 2) * L * 0.42, h = w / 2 * Math.sqrt(Math.max(0, 1 - (x / (L / 2)) ** 2)) * 0.9; c.moveTo(x, -h); c.lineTo(x, h); }
+            c.moveTo(-L * 0.4, 0); c.lineTo(L * 0.4, 0); c.stroke(); c.globalAlpha = 1;
+          }
+        } else if (o.k === "para") {
+          const L = o.L * ppu, W = L * 0.3;
+          c.strokeStyle = K.pale; c.fillStyle = K.soft;
+          c.beginPath(); c.moveTo(L / 2, 0);
+          c.bezierCurveTo(L / 2, -W * 0.7, -L / 2, -W * 0.55, -L / 2, 0);
+          c.bezierCurveTo(-L / 2, W * 0.55, L * 0.05, W * 0.75, L / 2, 0); c.fill(); c.stroke();
+          if (L > 30) {
+            c.globalAlpha = 0.5; c.beginPath();
+            for (let i = 0; i < 70; i++) {
+              const u = i / 70, ang = u * 6.2832, ex = Math.cos(ang) * L / 2, ey = Math.sin(ang) * W * 0.62;
+              const wv = Math.sin(t * 0.02 - u * 30) * 0.5 + 0.5, nx = Math.cos(ang), ny = Math.sin(ang) * 1.8;
+              const nl = Math.hypot(nx, ny), len = Math.max(1.5, L * 0.03) * (0.6 + wv * 0.6);
+              c.moveTo(ex, ey); c.lineTo(ex + nx / nl * len, ey + ny / nl * len);
+            }
+            c.stroke();
+            c.beginPath(); c.arc(-L * 0.28, 0, W * 0.12 * (0.7 + 0.3 * Math.sin(t * 0.003)), 0, 6.2832); c.arc(L * 0.25, 0, W * 0.1, 0, 6.2832); c.stroke();
+            c.beginPath(); c.moveTo(L * 0.05, W * 0.05); c.quadraticCurveTo(-L * 0.05, W * 0.3, -L * 0.15, W * 0.12); c.stroke();
+            c.globalAlpha = 1;
+          }
+        } else if (o.k === "volv") {
+          const r = o.r * ppu;
+          c.strokeStyle = K.green; c.fillStyle = K.soft;
+          c.beginPath(); c.arc(0, 0, r, 0, 6.2832); c.fill(); c.stroke();
+          c.fillStyle = K.green;
+          const dots = r > 40 ? 120 : 40;
+          for (let i = 0; i < dots; i++) {
+            const a = i * 2.39996 + o.ph, rr = r * Math.sqrt((i + 0.5) / dots);
+            c.globalAlpha = 0.35 + 0.5 * (rr / r);
+            c.fillRect(Math.cos(a) * rr, Math.sin(a) * rr, Math.max(0.8, ppu * 4), Math.max(0.8, ppu * 4));
+          }
+          c.globalAlpha = 0.9;
+          for (let j = 0; j < o.d; j++) {
+            const a = j / o.d * 6.2832 + o.ph * 0.5, dr = r * 0.22;
+            c.beginPath(); c.arc(Math.cos(a) * r * 0.45, Math.sin(a) * r * 0.45, dr, 0, 6.2832); c.stroke();
+          }
+          c.globalAlpha = 1;
+        }
+        c.restore();
+      }
+    };
+
+    const PH = [["Interphase", 1400], ["Prophase", 1200], ["Metaphase", 1100], ["Anaphase", 1100], ["Telophase", 1300], ["Cytokinesis", 1600]];
+    const drawCells = (t, K) => {
+      for (const cell of cells) {
+        let dt = t - cell.t0, i = 0;
+        while (i < PH.length && dt > PH[i][1]) { dt -= PH[i][1]; i++; }
+        const done = i >= PH.length, k = done ? 1 : dt / PH[i][1], name = done ? "" : PH[i][0];
+        const [px, py] = P(cell.x, cell.y), R = 30 * ppu * (i === 0 ? 0.9 + 0.1 * k : 1);
+        c.save(); c.translate(px, py); c.rotate(cell.a);
+        c.strokeStyle = K.pale; c.fillStyle = K.soft; c.lineWidth = Math.max(0.8, ppu);
+        let sep = 0;
+        if (name === "Telophase") sep = k * 0.45; else if (name === "Cytokinesis") sep = 0.45 + k * 0.6; else if (done) sep = 1.05;
+        if (sep > 0) {
+          const off = R * sep, rr = R * (1 - sep * 0.22);
+          for (const sx of [-1, 1]) { c.beginPath(); c.arc(sx * off, 0, rr, 0, 6.2832); c.fill(); c.stroke(); }
+        } else { c.beginPath(); c.arc(0, 0, R, 0, 6.2832); c.fill(); c.stroke(); }
+        c.strokeStyle = K.gold; c.fillStyle = K.gold;
+        if (name === "Interphase" || done) {
+          for (const sx of done ? [-1, 1] : [0]) { c.globalAlpha = 0.7; c.beginPath(); c.arc(sx * R * sep, 0, R * 0.32, 0, 6.2832); c.stroke(); c.globalAlpha = 1; }
+        } else if (name === "Prophase") {
+          c.globalAlpha = 0.85; c.beginPath();
+          for (let j = 0; j < 6; j++) { const a = j * 1.05, rr = R * 0.25; c.moveTo(Math.cos(a) * rr, Math.sin(a) * rr); c.lineTo(Math.cos(a + 0.6) * rr * 0.4, Math.sin(a + 0.6) * rr * 0.4 + R * 0.08); }
+          c.stroke(); c.globalAlpha = 1;
+        } else {
+          const spread = name === "Metaphase" ? 0 : name === "Anaphase" ? k * 0.55 : 0.55 + (name === "Cytokinesis" ? sep - 0.45 : sep * 0.3);
+          for (const sx of name === "Metaphase" ? [0] : [-1, 1]) {
+            for (let j = -2; j <= 2; j++) c.fillRect(sx * R * spread - Math.max(1, ppu * 2), j * R * 0.14 - Math.max(0.5, ppu), Math.max(2, ppu * 4), Math.max(1, ppu * 2));
+          }
+          if (name === "Metaphase" || name === "Anaphase") {
+            c.globalAlpha = 0.35; c.beginPath();
+            for (let j = -2; j <= 2; j++) { c.moveTo(-R * 0.85, 0); c.lineTo(sx0(name, k) * R, j * R * 0.14); c.moveTo(R * 0.85, 0); c.lineTo(-sx0(name, k) * R, j * R * 0.14); }
+            c.stroke(); c.globalAlpha = 1;
+          }
+        }
+        c.restore();
+        if (name && R > 4) {
+          c.fillStyle = getComputedStyle(root).getPropertyValue("--soft"); c.font = "11px 'IBM Plex Mono', monospace";
+          c.fillText(name, px + R * 1.4 + 8, py - R * 0.6);
+        }
+      }
+    };
+    const sx0 = (name, k) => name === "Metaphase" ? 0 : -k * 0.55;
+
+    // ---------- Eternal zoom: from pond water to the Planck scale, forever ----------
+    let eternal = false, ez = 1, ei = 0, eLast = 0, eHold = false, eField = 4.5e-4, eName = "";
+    const LAY = [
+      ["Pond water", 4.5e-4], ["A single cell", 6e-5], ["The nucleus", 8e-6], ["Chromatin · DNA wound on histones", 4e-7],
+      ["DNA double helix", 4e-8], ["Base pairs · A–T and G–C", 4e-9], ["Cytosine · one DNA letter", 8e-10],
+      ["Carbon atom · mostly empty space", 3e-10], ["Atomic nucleus · 6 protons, 6 neutrons", 1e-14],
+      ["Proton · three quarks bound by gluons", 2e-15], ["Planck scale · space itself turns to foam", 1.6e-35]
+    ];
+    const sup = n => String(n).split("").map(ch => "⁰¹²³⁴⁵⁶⁷⁸⁹"["0123456789".indexOf(ch)] || (ch === "-" ? "⁻" : ch)).join("");
+    const fmtLen = m => {
+      const U = [[1e-3, "mm"], [1e-6, "µm"], [1e-9, "nm"], [1e-12, "pm"], [1e-15, "fm"]];
+      for (const [u, n] of U) if (m >= u) { const v = m / u; return (v >= 100 ? Math.round(v) : v >= 10 ? v.toFixed(0) : v.toFixed(1)) + " " + n; }
+      if (m >= 1e-18) return (m / 1e-15).toFixed(3) + " fm";
+      const e = Math.floor(Math.log10(m)); return (m / 10 ** e).toFixed(1) + " × 10" + sup(e) + " m";
+    };
+    const seedOf = n => { let v = n * 9301 + 49297; return () => (v = v * 16807 % 2147483647) / 2147483647; };
+    const D = (() => {
+      const r0 = seedOf(1), r1 = seedOf(2), r2 = seedOf(3), r8 = seedOf(9);
+      const nuc = [];
+      for (let tries = 0; nuc.length < 12 && tries < 5000; tries++) {
+        const a = r8() * 6.28, d = nuc.length ? 0.2 + r8() * 0.55 : 0;
+        const x = Math.cos(a) * d, y = Math.sin(a) * d;
+        if (nuc.every(q => Math.hypot(q.x - x, q.y - y) > 0.24)) nuc.push({ x, y, p: nuc.length % 2 === 0 });
+      }
+      return {
+        bac: Array.from({ length: 60 }, () => ({ x: (r0() - 0.5) * 3, y: (r0() - 0.5) * 3, a: r0() * 6.28 })),
+        dia: Array.from({ length: 4 }, () => ({ x: (r0() - 0.5) * 2, y: (r0() - 0.5) * 2, r: 0.08 + r0() * 0.1 })),
+        speck: Array.from({ length: 280 }, () => { const a = r1() * 6.28, d = 0.2 + r1() * 0.68; return { x: Math.cos(a) * d, y: Math.sin(a) * d }; }),
+        mito: Array.from({ length: 14 }, () => { const a = r1() * 6.28, d = 0.32 + r1() * 0.45; return { x: Math.cos(a) * d, y: Math.sin(a) * d, a: r1() * 6.28, s: 0.06 + r1() * 0.04 }; }),
+        chrom: Array.from({ length: 70 }, () => { let x = (r2() - 0.5) * 1.5, y = (r2() - 0.5) * 1.5; const pts = []; for (let k = 0; k < 14; k++) { x += (r2() - 0.5) * 0.08; y += (r2() - 0.5) * 0.08; pts.push([x, y]); } return pts; }).filter(p => Math.hypot(p[0][0], p[0][1]) < 0.8),
+        nuc
+      };
+    })();
+
+    const LAYER = [
+      // 0 pond water
+      (K, u, t) => {
+        c.strokeStyle = K.rim; c.lineWidth = u * 1.4; c.beginPath();
+        for (const b of D.bac) { const L = 0.018; c.moveTo(b.x - Math.cos(b.a) * L, b.y - Math.sin(b.a) * L); c.lineTo(b.x + Math.cos(b.a) * L, b.y + Math.sin(b.a) * L); }
+        c.stroke();
+        c.strokeStyle = K.gold; c.lineWidth = u;
+        for (const d of D.dia) { c.beginPath(); c.arc(d.x, d.y, d.r, 0, 6.2832); c.stroke(); c.beginPath(); for (let k = 0; k < 20; k++) { const a = k / 20 * 6.2832; c.moveTo(d.x + Math.cos(a) * d.r * 0.3, d.y + Math.sin(a) * d.r * 0.3); c.lineTo(d.x + Math.cos(a) * d.r, d.y + Math.sin(a) * d.r); } c.stroke(); }
+        c.strokeStyle = K.pale; c.fillStyle = K.soft; c.lineWidth = u * 1.2;
+        c.beginPath(); c.arc(0, 0, 0.13, 0, 6.2832); c.fill(); c.stroke();
+        c.beginPath(); c.arc(0, 0, 0.02, 0, 6.2832); c.stroke();
+      },
+      // 1 cell
+      (K, u) => {
+        c.strokeStyle = K.pale; c.fillStyle = K.soft; c.lineWidth = u * 1.5;
+        c.beginPath(); c.arc(0, 0, 0.9, 0, 6.2832); c.fill(); c.stroke();
+        c.fillStyle = K.rim; for (const p of D.speck) c.fillRect(p.x, p.y, u * 1.4, u * 1.4);
+        c.strokeStyle = K.gold; c.lineWidth = u;
+        for (const m of D.mito) { c.save(); c.translate(m.x, m.y); c.rotate(m.a); c.beginPath(); c.ellipse(0, 0, m.s, m.s * 0.45, 0, 0, 6.2832); c.stroke(); c.beginPath(); for (let k = -2; k <= 2; k++) { c.moveTo(k * m.s * 0.3, -m.s * 0.35); c.lineTo(k * m.s * 0.3 + m.s * 0.1, m.s * 0.35); } c.stroke(); c.restore(); }
+        c.strokeStyle = K.green; c.lineWidth = u; c.globalAlpha *= 0.7;
+        for (let k = 0; k < 5; k++) { c.beginPath(); c.arc(0, 0, 0.17 + k * 0.035, -1.2 + k * 0.2, 1.4 + k * 0.15); c.stroke(); }
+        c.globalAlpha /= 0.7;
+        c.strokeStyle = K.pale; c.lineWidth = u * 1.5; c.beginPath(); c.arc(0, 0, 0.12, 0, 6.2832); c.stroke();
+        c.fillStyle = K.gold; c.beginPath(); c.arc(0.03, -0.02, 0.025, 0, 6.2832); c.fill();
+      },
+      // 2 nucleus
+      (K, u) => {
+        c.strokeStyle = K.pale; c.lineWidth = u * 1.4;
+        c.beginPath(); c.arc(0, 0, 0.92, 0, 6.2832); c.stroke(); c.beginPath(); c.arc(0, 0, 0.87, 0, 6.2832); c.stroke();
+        c.fillStyle = K.rim; for (let k = 0; k < 48; k++) { const a = k / 48 * 6.2832; c.beginPath(); c.arc(Math.cos(a) * 0.895, Math.sin(a) * 0.895, 0.012, 0, 6.2832); c.fill(); }
+        c.fillStyle = K.gold; c.globalAlpha *= 0.6; c.beginPath(); c.arc(0.35, -0.3, 0.18, 0, 6.2832); c.fill(); c.globalAlpha /= 0.6;
+        c.strokeStyle = K.green; c.lineWidth = u * 1.1;
+        for (const pts of D.chrom) { c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (const q of pts) c.lineTo(q[0], q[1]); c.stroke(); }
+        c.beginPath(); for (let k = 0; k <= 60; k++) { const a = k / 60 * 12.56, r = 0.03 + k / 60 * 0.06; c.lineTo(Math.cos(a) * r, Math.sin(a) * r); } c.stroke();
+      },
+      // 3 chromatin
+      (K, u) => {
+        c.strokeStyle = K.pale; c.lineWidth = u * 1.2;
+        const path = x => 0.28 * Math.sin(x * 2.1) * Math.min(1, Math.abs(x) * 3);
+        c.beginPath(); for (let x = -1.6; x <= 1.6; x += 0.01) c.lineTo(x, path(x)); c.stroke();
+        c.fillStyle = K.soft; c.strokeStyle = K.green;
+        for (let x = -1.55; x <= 1.6; x += 0.13) { const xx = Math.abs(x) < 0.07 ? 0 : x; c.beginPath(); c.arc(xx, path(xx), 0.045, 0, 6.2832); c.fill(); c.stroke(); }
+        c.strokeStyle = K.gold; c.lineWidth = u; c.beginPath(); c.arc(0, 0, 0.05, 0, 6.2832); c.stroke();
+      },
+      // 4 DNA helix
+      (K, u, t) => {
+        c.save(); c.rotate(-0.45);
+        const ph = t * 0.0006;
+        c.lineWidth = u * 1.8;
+        for (const [o, colr] of [[0, K.pale], [Math.PI * 0.75, K.green]]) {
+          c.strokeStyle = colr; c.beginPath();
+          for (let x = -1.8; x <= 1.8; x += 0.01) c.lineTo(x, 0.16 * Math.sin(x * 8 + o + ph));
+          c.stroke();
+        }
+        c.strokeStyle = K.gold; c.lineWidth = u; c.globalAlpha *= 0.7; c.beginPath();
+        for (let x = -1.8; x <= 1.8; x += 0.045) { c.moveTo(x, 0.16 * Math.sin(x * 8 + ph)); c.lineTo(x, 0.16 * Math.sin(x * 8 + Math.PI * 0.75 + ph)); }
+        c.stroke(); c.globalAlpha /= 0.7; c.restore();
+      },
+      // 5 base pairs
+      (K, u) => {
+        const pairs = ["AT", "GC", "TA", "CG", "AT", "GC", "CG", "TA", "GC"];
+        const colr = { A: K.green, T: K.pale, G: K.gold, C: "#ff8fc8" };
+        c.lineWidth = u * 1.5; c.strokeStyle = K.pale;
+        for (const sx of [-0.55, 0.55]) { c.beginPath(); c.moveTo(sx, -1.4); c.lineTo(sx, 1.4); c.stroke(); for (let y = -1.3; y <= 1.3; y += 0.27) { c.beginPath(); c.arc(sx, y, 0.035, 0, 6.2832); c.stroke(); } }
+        c.font = `${14 * u}px 'IBM Plex Mono', monospace`;
+        pairs.forEach((pr, k) => {
+          const y = (k - 4) * 0.27;
+          c.strokeStyle = colr[pr[0]]; c.beginPath(); c.moveTo(-0.55, y); c.lineTo(0, y); c.stroke();
+          c.strokeStyle = colr[pr[1]]; c.beginPath(); c.moveTo(0, y); c.lineTo(0.55, y); c.stroke();
+          c.fillStyle = colr[pr[0]]; c.fillText(pr[0], -0.36, y - 0.03);
+          c.fillStyle = colr[pr[1]]; c.fillText(pr[1], 0.28, y - 0.03);
+        });
+        c.strokeStyle = "#ff8fc8"; c.beginPath();
+        for (let k = 0; k < 6; k++) { const a = k / 6 * 6.2832; c.lineTo(Math.cos(a) * 0.05, Math.sin(a) * 0.05); } c.closePath(); c.stroke();
+      },
+      // 6 cytosine molecule (a carbon atom sits at the centre)
+      (K, u) => {
+        const R = 0.34, ring = [];
+        for (let k = 0; k < 6; k++) { const a = Math.PI + k / 6 * 6.2832; ring.push([R + Math.cos(a) * R, Math.sin(a) * R]); }
+        const atoms = ["C", "N", "C", "C", "C", "N"];
+        c.strokeStyle = K.pale; c.lineWidth = u * 2;
+        c.beginPath(); ring.forEach(p => c.lineTo(p[0], p[1])); c.closePath(); c.stroke();
+        const sub = [[2, "N", 1.5], [4, "O", 0.4]];
+        for (const [k, el, ang] of sub) { const p = ring[k], q = [p[0] + Math.cos(ang - 0.6) * 0.3, p[1] + Math.sin(ang - 0.6) * 0.3]; c.beginPath(); c.moveTo(p[0], p[1]); c.lineTo(q[0], q[1]); c.stroke(); ring.push(q); atoms.push(el); }
+        c.font = `${15 * u}px 'IBM Plex Mono', monospace`;
+        ring.forEach((p, k) => {
+          const el = atoms[k], fill = el === "C" ? K.rim : el === "N" ? "#8fb6ff" : "#ff8a7a";
+          const g2 = c.createRadialGradient(p[0], p[1], 0, p[0], p[1], 0.09);
+          g2.addColorStop(0, fill); g2.addColorStop(1, "rgba(0,0,0,0)");
+          c.fillStyle = g2; c.beginPath(); c.arc(p[0], p[1], 0.09, 0, 6.2832); c.fill();
+          if (k) { c.fillStyle = fill; c.fillText(el, p[0] + 0.05, p[1] - 0.06); }
+        });
+      },
+      // 7 carbon atom: electron cloud
+      (K, u, t) => {
+        const g2 = c.createRadialGradient(0, 0, 0, 0, 0, 0.9);
+        g2.addColorStop(0, "rgba(140,190,255,.30)"); g2.addColorStop(0.35, "rgba(120,160,255,.14)"); g2.addColorStop(1, "rgba(120,160,255,0)");
+        c.fillStyle = g2; c.beginPath(); c.arc(0, 0, 0.9, 0, 6.2832); c.fill();
+        c.strokeStyle = K.pale; c.lineWidth = u;
+        for (const a of [0, 1.05, 2.1]) { c.save(); c.rotate(a + t * 0.0001); c.globalAlpha *= 0.5; c.beginPath(); c.ellipse(0.32, 0, 0.3, 0.13, 0, 0, 6.2832); c.ellipse(-0.32, 0, 0.3, 0.13, 0, 0, 6.2832); c.stroke(); c.globalAlpha /= 0.5; c.restore(); }
+        c.fillStyle = "#ffb070"; c.beginPath(); c.arc(0, 0, Math.max(0.006, u * 2), 0, 6.2832); c.fill();
+      },
+      // 8 atomic nucleus
+      (K, u) => {
+        for (const q of D.nuc) {
+          const g2 = c.createRadialGradient(q.x - 0.05, q.y - 0.05, 0.01, q.x, q.y, 0.15);
+          g2.addColorStop(0, q.p ? "#ffb39a" : "#e6e9f5"); g2.addColorStop(1, q.p ? "rgba(230,80,60,.15)" : "rgba(150,160,190,.12)");
+          c.fillStyle = g2; c.beginPath(); c.arc(q.x, q.y, 0.15, 0, 6.2832); c.fill();
+        }
+      },
+      // 9 proton
+      (K, u, t) => {
+        c.strokeStyle = K.pale; c.lineWidth = u; c.setLineDash([u * 4, u * 6]); c.beginPath(); c.arc(0, 0, 0.85, 0, 6.2832); c.stroke(); c.setLineDash([]);
+        const qs = [["u", "#ff5a5a"], ["u", "#5aff8a"], ["d", "#5a8aff"]].map(([n, cl], k) => { const a = k / 3 * 6.2832 + t * 0.0004; return { n, cl, x: Math.cos(a) * 0.38 + Math.sin(t * 0.003 + k) * 0.03, y: Math.sin(a) * 0.38 }; });
+        c.strokeStyle = K.gold; c.lineWidth = u * 1.2;
+        for (let k = 0; k < 3; k++) { const p = qs[k], q = qs[(k + 1) % 3]; c.beginPath(); for (let s2 = 0; s2 <= 1; s2 += 0.02) { const x = p.x + (q.x - p.x) * s2, y = p.y + (q.y - p.y) * s2, nx = -(q.y - p.y), ny = q.x - p.x, w = Math.sin(s2 * 40 + t * 0.01) * 0.03; c.lineTo(x + nx * w, y + ny * w); } c.stroke(); }
+        c.font = `${16 * u}px 'IBM Plex Mono', monospace`;
+        for (const q of qs) { const g2 = c.createRadialGradient(q.x, q.y, 0, q.x, q.y, 0.1); g2.addColorStop(0, "#ffffff"); g2.addColorStop(0.3, q.cl); g2.addColorStop(1, "rgba(0,0,0,0)"); c.fillStyle = g2; c.beginPath(); c.arc(q.x, q.y, 0.1, 0, 6.2832); c.fill(); c.fillStyle = q.cl; c.fillText(q.n, q.x + 0.1, q.y - 0.08); }
+        const fr = seedOf((t / 120) | 0);
+        c.fillStyle = K.rim; for (let k = 0; k < 40; k++) { const a = fr() * 6.28, d = fr() * 0.8; c.fillRect(Math.cos(a) * d, Math.sin(a) * d, u * 2, u * 2); }
+      },
+      // 10 Planck foam
+      (K, u, t) => {
+        const fr = seedOf((t / 90) | 0);
+        c.strokeStyle = K.rim; c.lineWidth = u;
+        for (let k = 0; k < 260; k++) { const x = (fr() - 0.5) * 2.2, y = (fr() - 0.5) * 2.2, r = 0.01 + fr() * 0.07; c.globalAlpha = 0.15 + fr() * 0.5; c.beginPath(); c.arc(x, y, r, 0, 6.2832); c.stroke(); }
+        c.globalAlpha = 1;
+      }
+    ];
+    const NL = LAYER.length;
+    const drawLayer = (i, s, a, K, t) => {
+      if (a <= 0.01 || s * LR < 2) return;
+      c.save(); c.translate(LX, LY); c.scale(LR * s, LR * s);
+      c.globalAlpha = a;
+      LAYER[((i % NL) + NL) % NL](K, 1 / (LR * s), t);
+      c.restore(); c.globalAlpha = 1;
+    };
+    const drawEternal = (t, dark, K) => {
+      const dt = Math.min(64, t - (eLast || t)); eLast = t;
+      if (!reduceMotion) ez *= Math.exp(dt * (eHold ? 0.0016 : 0.00042));
+      while (ez >= 10) { ez /= 10; ei = (ei + 1) % NL; }
+      while (ez < 1) { ez *= 10; ei = (ei - 1 + NL) % NL; }
+      const aCur = Math.min(1, Math.max(0, (10 - ez) / 5)), aNext = Math.min(1, Math.max(0, (ez - 3) / 5));
+      drawLayer(ei, ez, aCur, K, t);
+      drawLayer(ei + 1, ez / 10, aNext, K, t);
+      const w0 = LAY[ei][1], w1 = LAY[(ei + 1) % NL][1], f = Math.log10(ez);
+      eField = ei === NL - 1 ? w0 : w1 / w0 < 1e-6 ? (ez < 5.5 ? w0 : w1) : w0 * Math.pow(w1 / w0, f);
+      eName = ez < 5.5 ? LAY[ei][0] : LAY[(ei + 1) % NL][0];
+      if (ei === NL - 1 && ez >= 5.5) eName = "…and back to the pond";
+    };
+    sc.addEventListener("wheel", e => {
+      if (!eternal) return;
+      const [x, y] = local(e); if (!inLens(x, y)) return;
+      e.preventDefault();
+      ez *= Math.exp(-e.deltaY * 0.0018);
+      if (reduceMotion) requestAnimationFrame(frame);
+    }, { passive: false });
+
+    let hover = null, anim = false, drag = null;
+    const frame = t => {
+      const dark = root.dataset.theme !== "light", K = col(dark);
+      ppu += (tpp - ppu) * 0.12;
+      c.clearRect(0, 0, MW, MH);
+      c.save();
+      c.beginPath(); c.arc(LX, LY, LR, 0, 6.2832); c.clip();
+      const bg = c.createRadialGradient(LX, LY, LR * 0.1, LX, LY, LR);
+      bg.addColorStop(0, K.bg0); bg.addColorStop(1, K.bg1);
+      c.fillStyle = bg; c.fillRect(LX - LR, LY - LR, LR * 2, LR * 2);
+      if (dark) c.globalCompositeOperation = "lighter";
+      if (eternal) drawEternal(t, dark, K); else { drawLife(t, dark, K); drawCells(t, K); }
+      c.globalCompositeOperation = "source-over";
+      // eyepiece vignette
+      const vg = c.createRadialGradient(LX, LY, LR * 0.7, LX, LY, LR);
+      vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, dark ? "rgba(0,0,0,.85)" : "rgba(60,50,30,.35)");
+      c.fillStyle = vg; c.fillRect(LX - LR, LY - LR, LR * 2, LR * 2);
+      c.restore();
+      c.strokeStyle = getComputedStyle(root).getPropertyValue("--line"); c.lineWidth = 1;
+      c.beginPath(); c.arc(LX, LY, LR + 0.5, 0, 6.2832); c.stroke();
+      if (eternal) {
+        const soft2 = getComputedStyle(root).getPropertyValue("--soft");
+        c.fillStyle = soft2; c.font = "11px 'IBM Plex Mono', monospace";
+        const lab1 = `Field of view ${fmtLen(eField)}`, lab2 = eName;
+        c.fillText(lab1, LX - c.measureText(lab1).width / 2, LY + LR * 0.74);
+        c.fillStyle = getComputedStyle(root).getPropertyValue("--ink");
+        c.fillText(lab2, LX - c.measureText(lab2).width / 2, LY + LR * 0.74 + 16);
+        if (anim) requestAnimationFrame(frame);
+        return;
+      }
+      // scale bar
+      const bars = [10, 20, 50, 100, 200, 500, 1000];
+      const um = bars.find(b => b * ppu > 50) || 1000, bw = um * ppu;
+      const soft = getComputedStyle(root).getPropertyValue("--soft");
+      c.strokeStyle = soft; c.fillStyle = soft; c.lineWidth = 2;
+      c.beginPath(); c.moveTo(LX + LR * 0.55 - bw, LY + LR * 0.78); c.lineTo(LX + LR * 0.55, LY + LR * 0.78); c.stroke();
+      c.font = "11px 'IBM Plex Mono', monospace";
+      c.fillText(`${um} µm`, LX + LR * 0.55 - bw, LY + LR * 0.78 - 7);
+      c.fillText(`${mag}×`, LX - LR * 0.6, LY + LR * 0.78);
+      if (hover) { c.fillStyle = getComputedStyle(root).getPropertyValue("--ink"); c.fillText(hover.label, Math.min(hover.x + 14, MW - c.measureText(hover.label).width - 8), hover.y - 12); }
+      if (anim) requestAnimationFrame(frame);
+    };
+
+    const scIO = new IntersectionObserver(es => {
+      const v = es[0].isIntersecting;
+      if (v && !anim) { anim = true; requestAnimationFrame(frame); }
+      if (!v) anim = false;
+    });
+    if (reduceMotion) requestAnimationFrame(frame); else scIO.observe(lab);
+
+    const toWorld = (x, y) => [vx + (x - LX) / ppu, vy + (y - LY) / ppu];
+    const local = e => { const r = sc.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+    const inLens = (x, y) => Math.hypot(x - LX, y - LY) < LR;
+    sc.addEventListener("pointerdown", e => {
+      const [x, y] = local(e); if (!inLens(x, y)) return;
+      if (eternal) { eHold = true; return; }
+      drag = { x, y, vx, vy, moved: false };
+      try { sc.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+    sc.addEventListener("pointermove", e => {
+      const [x, y] = local(e);
+      if (eternal) { hover = null; return; }
+      if (drag) {
+        if (Math.hypot(x - drag.x, y - drag.y) > 4) { drag.moved = true; sc.classList.add("drag"); }
+        vx = drag.vx - (x - drag.x) / ppu; vy = drag.vy - (y - drag.y) / ppu;
+        hover = null; return;
+      }
+      if (!inLens(x, y)) { hover = null; return; }
+      const [wx2, wy2] = toWorld(x, y);
+      let best = null, bd = 30 / ppu;
+      for (const o of life) { const d = Math.hypot(o.x - wx2, o.y - wy2) - (o.r || (o.L || 4) / 2); if (d < bd) { bd = d; best = o; } }
+      for (const cl of cells) { const d = Math.hypot(cl.x - wx2, cl.y - wy2) - 30; if (d < bd) { bd = d; best = { k: "cell" }; } }
+      if (!best) { hover = null; return; }
+      let label = NAMES[best.k];
+      if (best.k === "cdia" || best.k === "pdia") label += `~${Math.round(best.k === "cdia" ? best.r * 2 : best.r * 2.4)} µm`;
+      if (best.k === "para") label += `${Math.round(best.L)} µm`;
+      if (best.k === "volv") label += `${Math.round(best.r * 2)} µm`;
+      hover = { x, y, label };
+      if (reduceMotion) requestAnimationFrame(frame);
+    });
+    sc.addEventListener("pointerleave", () => { hover = null; });
+    sc.addEventListener("pointerup", e => {
+      sc.classList.remove("drag");
+      eHold = false;
+      if (drag && !drag.moved) {
+        const [x, y] = local(e);
+        if (inLens(x, y)) {
+          const [wx2, wy2] = toWorld(x, y);
+          cells.push({ x: wx2, y: wy2, a: Math.random() * 3.14, t0: performance.now() });
+          if (cells.length > 24) cells.shift();
+          hint.textContent = mag < 400 ? "Cell dividing · switch to 400× for a closer look" : "Cell dividing · watch the chromosomes line up and pull apart";
+        }
+      }
+      drag = null;
+      if (reduceMotion) requestAnimationFrame(frame);
+    });
+    for (const b of lab.querySelectorAll(".mag button")) b.addEventListener("click", () => {
+      eternal = b.dataset.m === "inf";
+      hint.textContent = eternal ? "Eternal zoom · scroll to steer · hold to fall faster" : "Drag to move the slide · click to start a cell dividing";
+      sc.style.cursor = eternal ? "zoom-in" : "";
+      if (eternal) { ez = 1; ei = 0; eLast = performance.now(); }
+      else { mag = +b.dataset.m; tpp = (2 * LR) / FOV[mag]; }
+      for (const o of lab.querySelectorAll(".mag button")) o.setAttribute("aria-pressed", o === b ? "true" : "false");
+      if (reduceMotion) { ppu = tpp; requestAnimationFrame(frame); }
+    });
+  }
+
+  // ---------- Celestial paintbrush: the cursor paints, and changes with each toy ----------
+  {
+    const bc = document.getElementById("brush");
+    const b = bc.getContext("2d");
+    const fine = window.matchMedia("(pointer: fine)").matches;
+    let BW2 = 0, BH2 = 0, parts = [], px2 = -99, py2 = -99, lx = null, ly = null, zone = "sky", overBtn = false, seen = false, running2 = false;
+    const sizeB = () => {
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      BW2 = window.innerWidth; BH2 = window.innerHeight;
+      bc.width = Math.round(BW2 * dpr); bc.height = Math.round(BH2 * dpr);
+      b.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    sizeB(); window.addEventListener("resize", sizeB);
+    const ZONES = [["nebula", document.getElementById("heroband")], ["nursery", document.getElementById("lab-1")], ["scope", document.getElementById("lab-2")]];
+    const zoneAt = (x, y) => {
+      for (const [z, el] of ZONES) { const r = el.getBoundingClientRect(); if (y >= r.top && y <= r.bottom && x >= r.left && x <= r.right) return z; }
+      return "sky";
+    };
+    const NEB = [["#8a6cff", "#e94faa", "#50d6dc"], ["#3a8cff", "#46d6d2", "#9af5ea"], ["#ff7a4a", "#f2b35c", "#ffe1a0"], ["#2fb08a", "#7fe08a", "#d8f5a0"], ["#c45cff", "#ff6fb5", "#78e6f0"]];
+    const pick = a => a[(Math.random() * a.length) | 0];
+    const emit = (x, y, z, dark) => {
+      const R = Math.random;
+      if (z === "nebula") {
+        const pal = NEB[typeof tint === "number" ? tint : 0];
+        parts.push({ k: "wisp", x, y, vx: (R() - 0.5) * 0.25, vy: (R() - 0.5) * 0.25, r: 10 + R() * 22, c: pick(pal), life: 1400 + R() * 900, t: 0 });
+        if (R() < 0.5) parts.push({ k: "spark", x: x + (R() - 0.5) * 12, y: y + (R() - 0.5) * 12, vx: (R() - 0.5) * 0.4, vy: (R() - 0.5) * 0.4, r: 1 + R() * 1.4, c: dark ? "#ffffff" : "#3a2a7a", life: 700 + R() * 700, t: 0 });
+      } else if (z === "nursery") {
+        parts.push({ k: "ember", x, y, vx: (R() - 0.5) * 0.3, vy: -0.25 - R() * 0.45, r: 1.2 + R() * 2.4, c: pick(["#ffb347", "#ff7a3d", "#ffd27a", "#ff5a5a"]), life: 900 + R() * 900, t: 0, ph: R() * 6 });
+      } else if (z === "scope") {
+        if (R() < 0.7) parts.push({ k: "bubble", x, y, vx: (R() - 0.5) * 0.15, vy: -0.08 - R() * 0.2, r: 2 + R() * 6, c: pick(dark ? ["#86e39a", "#cfeef0", "#58e0d8"] : ["#2f7d3a", "#3c5a66", "#0f766e"]), life: 1400 + R() * 1200, t: 0, ph: R() * 6 });
+        else parts.push({ k: "rod", x, y, vx: (R() - 0.5) * 0.3, vy: (R() - 0.5) * 0.3, r: 3 + R() * 4, a: R() * 6.28, c: dark ? "#f4cf72" : "#8a6414", life: 1000 + R() * 900, t: 0 });
+      } else {
+        parts.push({ k: "dust", x: x + (R() - 0.5) * 6, y: y + (R() - 0.5) * 6, vx: (R() - 0.5) * 0.12, vy: 0.04 + R() * 0.12, r: 0.8 + R() * 1.6, c: pick(dark ? ["#ffffff", "#a9c8ff", "#ffd9a0", "#ff86cf", "#86f2ea"] : ["#2b4fb3", "#6d28d9", "#c2410c", "#b0185a", "#0f766e"]), life: 900 + R() * 1100, t: 0, ph: R() * 6 });
+      }
+      if (parts.length > 700) parts.splice(0, parts.length - 700);
+    };
+    const tip = (x, y, z, dark, t) => {
+      const ink = dark ? "#ffffff" : "#14141b";
+      b.save(); b.translate(x, y);
+      if (overBtn) { b.strokeStyle = ink; b.globalAlpha = 0.8; b.lineWidth = 1.2; b.beginPath(); b.arc(0, 0, 14, 0, 6.2832); b.stroke(); }
+      if (z === "scope") {
+        b.strokeStyle = dark ? "#cfeef0" : "#0f766e"; b.lineWidth = 1; b.globalAlpha = 0.9;
+        b.beginPath(); b.arc(0, 0, 8, 0, 6.2832); b.moveTo(-13, 0); b.lineTo(-4, 0); b.moveTo(4, 0); b.lineTo(13, 0); b.moveTo(0, -13); b.lineTo(0, -4); b.moveTo(0, 4); b.lineTo(0, 13); b.stroke();
+      } else if (z === "nursery") {
+        const g3 = b.createRadialGradient(0, 0, 0, 0, 0, 9); g3.addColorStop(0, "#fff6e0"); g3.addColorStop(0.35, "#ffb347"); g3.addColorStop(1, "rgba(255,120,60,0)");
+        b.fillStyle = g3; b.beginPath(); b.arc(0, 0, 9, 0, 6.2832); b.fill();
+      } else {
+        const col2 = z === "nebula" ? NEB[typeof tint === "number" ? tint : 0][2] : ink;
+        const L = 9 + Math.sin(t * 0.004) * 1.5;
+        b.fillStyle = col2; b.strokeStyle = col2; b.lineWidth = 1; b.globalAlpha = 0.95;
+        b.beginPath(); b.moveTo(-L, 0); b.lineTo(L, 0); b.moveTo(0, -L); b.lineTo(0, L); b.stroke();
+        b.beginPath(); b.arc(0, 0, 2, 0, 6.2832); b.fill();
+      }
+      b.restore();
+    };
+    const loop2 = t => {
+      const dark = root.dataset.theme !== "light";
+      b.clearRect(0, 0, BW2, BH2);
+      b.globalCompositeOperation = dark ? "lighter" : "source-over";
+      const now = t;
+      parts = parts.filter(p => (p.t += 16) < p.life);
+      for (const p of parts) {
+        const k = p.t / p.life, a = 1 - k;
+        p.x += p.vx; p.y += p.vy;
+        if (p.k === "wisp") {
+          const r = p.r * (1 + k * 1.6), g3 = b.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+          g3.addColorStop(0, p.c + (dark ? "38" : "26")); g3.addColorStop(1, p.c + "00");
+          b.globalAlpha = a; b.fillStyle = g3; b.beginPath(); b.arc(p.x, p.y, r, 0, 6.2832); b.fill();
+        } else if (p.k === "spark" || p.k === "dust") {
+          const tw = p.k === "dust" ? 0.6 + 0.4 * Math.sin(now * 0.02 + p.ph) : 1;
+          b.globalAlpha = a * tw; b.fillStyle = p.c;
+          b.beginPath(); b.arc(p.x, p.y, p.r * (1 - k * 0.5), 0, 6.2832); b.fill();
+          if (p.r > 1.8 && dark) { b.globalAlpha = a * tw * 0.5; b.fillRect(p.x - p.r * 3, p.y - 0.4, p.r * 6, 0.8); b.fillRect(p.x - 0.4, p.y - p.r * 3, 0.8, p.r * 6); }
+        } else if (p.k === "ember") {
+          p.x += Math.sin(now * 0.006 + p.ph) * 0.15;
+          const r = p.r * (1 - k * 0.6), g3 = b.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 3);
+          g3.addColorStop(0, "#fff3d6"); g3.addColorStop(0.3, p.c); g3.addColorStop(1, p.c + "00");
+          b.globalAlpha = a * (0.7 + 0.3 * Math.sin(now * 0.03 + p.ph)); b.fillStyle = g3; b.beginPath(); b.arc(p.x, p.y, r * 3, 0, 6.2832); b.fill();
+        } else if (p.k === "bubble") {
+          p.x += Math.sin(now * 0.004 + p.ph) * 0.12;
+          b.globalAlpha = a * 0.8; b.strokeStyle = p.c; b.lineWidth = 1;
+          b.beginPath(); b.arc(p.x, p.y, p.r * (0.6 + k * 0.6), 0, 6.2832); b.stroke();
+        } else if (p.k === "rod") {
+          p.a += 0.02; b.globalAlpha = a; b.strokeStyle = p.c; b.lineWidth = 1.6; b.lineCap = "round";
+          b.beginPath(); b.moveTo(p.x - Math.cos(p.a) * p.r, p.y - Math.sin(p.a) * p.r); b.lineTo(p.x + Math.cos(p.a) * p.r, p.y + Math.sin(p.a) * p.r); b.stroke();
+        }
+      }
+      b.globalAlpha = 1; b.globalCompositeOperation = "source-over";
+      if (fine && seen) tip(px2, py2, zone, dark, now);
+      if (parts.length || (fine && seen)) requestAnimationFrame(loop2); else running2 = false;
+    };
+    const kick = () => { if (!running2) { running2 = true; requestAnimationFrame(loop2); } };
+    const onMove = e => {
+      px2 = e.clientX; py2 = e.clientY; seen = true;
+      zone = zoneAt(px2, py2);
+      const el = document.elementFromPoint(px2, py2);
+      overBtn = !!(el && el.closest("button, a"));
+      if (lx !== null) {
+        const d = Math.hypot(px2 - lx, py2 - ly), n = Math.min(8, Math.ceil(d / 7));
+        const dark = root.dataset.theme !== "light";
+        for (let i = 1; i <= n; i++) emit(lx + (px2 - lx) * i / n, ly + (py2 - ly) * i / n, zone, dark);
+      }
+      lx = px2; ly = py2;
+      kick();
+    };
+    if (!reduceMotion) {
+      if (fine) root.classList.add("brushing");
+      window.addEventListener("pointermove", onMove, { passive: true });
+      document.addEventListener("pointerleave", () => { seen = false; lx = null; });
+      window.addEventListener("blur", () => { seen = false; lx = null; });
+      window.addEventListener("scroll", () => { lx = null; if (seen) zone = zoneAt(px2, py2); }, { passive: true });
+    }
+  }
+
+  // ---------- Sky: local time and moon phase ----------
+  const clock = document.getElementById("clock");
+  const tf = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric", minute: "2-digit" });
+  const moonEl = document.getElementById("moonic"), phaseEl = document.getElementById("phase");
+  const SYN = 29.530588853, REF = Date.UTC(2000, 0, 6, 18, 14) / 864e5;
+  const moon = () => {
+    const age = (((Date.now() / 864e5 - REF) % SYN) + SYN) % SYN;
+    const lit = (1 - Math.cos(2 * Math.PI * age / SYN)) / 2;
+    const names = [[1.85, "New moon"], [5.53, "Waxing crescent"], [9.22, "First quarter"], [12.91, "Waxing gibbous"], [16.61, "Full moon"], [20.3, "Waning gibbous"], [23.99, "Last quarter"], [27.68, "Waning crescent"], [99, "New moon"]];
+    const name = names.find(n => age < n[0])[1];
+    phaseEl.textContent = `${name} · ${Math.round(lit * 100)}% lit`;
+    const waxing = age < SYN / 2, rx = Math.abs(1 - 2 * lit) * 6.5;
+    const sweepOuter = waxing ? 1 : 0, sweepInner = lit < 0.5 ? (waxing ? 0 : 1) : (waxing ? 1 : 0);
+    moonEl.innerHTML = `<circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1"/><path d="M8 1.5 A6.5 6.5 0 0 ${sweepOuter} 8 14.5 A${rx.toFixed(2)} 6.5 0 0 ${sweepInner} 8 1.5Z" fill="currentColor"/>`;
+  };
+  const tick = () => { clock.textContent = "Satsuma, FL · " + tf.format(new Date()).toLowerCase(); };
+  tick(); moon(); setInterval(() => { tick(); moon(); }, 30000);
+
+  // ---------- Wordmark: fit to one row, letters lift near the pointer ----------
+  const nameEl = document.getElementById("name");
+  const letters = [...nameEl.querySelectorAll("span")];
+  const fit = () => {
+    nameEl.style.fontSize = "";
+    const w = nameEl.clientWidth;
+    const fs = parseFloat(getComputedStyle(nameEl).fontSize);
+    const tw = letters[letters.length - 1].getBoundingClientRect().right - letters[0].getBoundingClientRect().left;
+    if (tw > 0) nameEl.style.fontSize = Math.min(400, fs * (w / tw) * 0.99) + "px";
+  };
+  fit();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  const nameRO = new ResizeObserver(fit);
+  nameRO.observe(nameEl.parentElement);
+  if (!reduceMotion) band.addEventListener("pointermove", e => {
     for (const s of letters) {
       const r = s.getBoundingClientRect();
-      const d = Math.abs(e.clientX - (r.left + r.width / 2));
-      s.style.transform = `translateY(${-Math.max(0, 1 - d / 160) * 18}px)`;
+      const dx = Math.abs(e.clientX - (r.left + r.width / 2)), dy = Math.abs(e.clientY - (r.top + r.height / 2));
+      const k = Math.max(0, 1 - dx / 160) * Math.max(0, 1 - dy / 260);
+      s.style.transform = `translateY(${-k * 18}px)`;
     }
   });
-  document.getElementById("name").addEventListener("pointerleave", () => { for (const s of letters) s.style.transform = ""; });
+  band.addEventListener("pointerleave", () => { for (const s of letters) s.style.transform = ""; });
 }
 </script>
 </body>
