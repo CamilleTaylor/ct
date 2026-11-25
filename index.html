@@ -132,6 +132,36 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
 .lab .eqn{padding-right:44px}
 .hero .qbtn{top:clamp(28px,6vw,88px);right:max(5vw,16px)}
 .hero .note{top:calc(clamp(28px,6vw,88px) + 42px);right:max(5vw,16px);width:min(360px,calc(100% - 2*max(5vw,16px)))}
+/* discoveries: the constellation button, its panel, and the toast */
+.stars{all:unset;box-sizing:border-box;cursor:pointer;height:44px;padding:0 14px;display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:99px;color:var(--ink);font:13px "IBM Plex Mono",ui-monospace,monospace;white-space:nowrap;transition:border-color .2s}
+.stars[hidden]{display:none}
+.stars:hover,.stars[aria-expanded=true]{border-color:var(--ink)}
+.stars:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.stars svg{width:13px;height:13px;color:var(--accent);flex:none}
+.stars.ping svg{animation:ping 1.4s ease-out}
+@keyframes ping{0%{transform:scale(1)}25%{transform:scale(1.9) rotate(45deg)}100%{transform:scale(1) rotate(90deg)}}
+.starpanel{position:fixed;top:74px;right:max(5vw,16px);z-index:20;width:min(340px,calc(100vw - 32px));max-height:calc(100svh - 92px);overflow:auto;padding:18px 20px 16px;border:1px solid var(--line);border-radius:16px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);font:300 14px/1.5 Sora,system-ui,sans-serif;animation:notein .25s ease-out}
+.starpanel[hidden]{display:none}
+.starpanel h2{margin:0 0 4px;font:400 13px/1.4 Michroma,sans-serif;letter-spacing:.04em}
+.starpanel .sub{color:var(--soft);font-size:12px}
+.starpanel svg{display:block;width:100%;max-width:230px;margin:10px auto 6px}
+.starpanel .links line{stroke:var(--accent);stroke-width:.7;opacity:.55}
+.starpanel .dim{fill:var(--soft);opacity:.45}
+.starpanel .lit circle{fill:var(--ink)}
+.starpanel .lit .halo{fill:var(--accent);opacity:.2}
+.starpanel .fresh .halo{animation:fresh 1.6s ease-out}
+@keyframes fresh{0%{opacity:.9;r:16}100%{opacity:.2;r:8}}
+.starpanel ol{list-style:none;margin:6px 0 0;padding:0;border-top:1px solid var(--line)}
+.starpanel li{padding:10px 0;border-bottom:1px solid var(--line)}
+.starpanel li b{display:block;font:500 12px/1.4 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.03em;color:var(--accent)}
+.starpanel li span{color:var(--soft)}
+.starpanel .forget{all:unset;cursor:pointer;margin-top:12px;font:12px "IBM Plex Mono",ui-monospace,monospace;color:var(--soft);text-decoration:underline;text-underline-offset:3px}
+.starpanel .forget:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+#toast{position:fixed;left:50%;bottom:22px;z-index:65;display:flex;gap:12px;align-items:center;width:max-content;max-width:min(92vw,560px);padding:12px 18px;border:1px solid var(--line);border-radius:16px;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--soft);font:300 14px/1.45 Sora,system-ui,sans-serif;opacity:0;transform:translate(-50%,14px);pointer-events:none;transition:opacity .4s,transform .4s}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#toast b{color:var(--ink);font-weight:500;margin-right:4px}
+#toast .tstar svg{width:16px;height:16px;display:block;color:var(--accent)}
+.hero h1{pointer-events:auto;width:max-content;max-width:100%}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
@@ -291,6 +321,123 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
     try { localStorage.setItem("ct-theme", root.dataset.theme); } catch (e) {}
     label();
   });
+
+  // ---------- Discoveries: hidden stars, collected into a sunflower constellation ----------
+  const find = (() => {
+    // id: [star title, the line shown when it is found]. Order sets where each star sits in the spiral.
+    const LIST = [
+      ["tour", "Grand tour", "You visited every corner of the playground."],
+      ["shapes", "Shapeshifter", "You have seen every creature the attractor rule can make."],
+      ["mitosis", "Mitosis", "You watched one cell become two, up close."],
+      ["golden", "Golden angle", "You found the sunflower's secret turn on purpose."],
+      ["harmony", "Perfect harmony", "You froze the pendulums on a perfect number ratio."],
+      ["patterns", "Skin and shells", "You grew coral, cells, mazes and holes."],
+      ["deep", "Bottom of the numbers", "You zoomed in until the computer ran out of digits."],
+      ["fourier", "Circle choir", "Spinning circles learned to trace your drawing."],
+      ["tear", "It heals", "You tore the slime mold's web three times, and it kept healing."],
+      ["rods", "Storm caller", "You drew lightning rods, and the storm came looking."],
+      ["unzip", "Unzipped", "You opened the DNA ladder and watched it copy itself."],
+      ["garden", "Gardener", "You grew a fern, a weed, a bush and a herb."],
+      ["hawk", "Murmuration", "The hawk chased them, and the flock still moved as one."],
+      ["sync", "In sync", "You got 240 strangers to blink as one."],
+      ["planck", "Planck scale", "You shrank down to the smallest size there is."],
+      ["spokes", "Broken sunflower", "Nudge the angle off gold and the dots fall into spokes."],
+      ["fractal", "Hidden picture", "Real DNA letters, dropped one at a time, drew a fractal."],
+      ["fish", "Feeding time", "You dropped food, and the whole school came."],
+      ["startle", "Startled", "You scattered a field that was perfectly in sync."],
+      ["pond", "Full circle", "You fell through everything and landed back in the pond."],
+      ["moon", "Moon touch", "You touched the moon."],
+      ["owl", "Night owl", "You came to the playground after midnight."],
+      ["name", "Magic word", "You typed the magic word."],
+      ["timelapse", "Time lapse", "Day, night, day, night. You made time go fast."],
+      ["hello", "Hello", "Hi, I'm Cami. Thanks for playing in here."]
+    ];
+    const IDX = new Map(LIST.map((d, i) => [d[0], i])), N = LIST.length;
+    let got = [];
+    try { got = JSON.parse(localStorage.getItem("ct-stars") || "[]").filter(id => IDX.has(id)); } catch (e) {}
+    const has = new Set(got);
+    const save = () => { try { localStorage.setItem("ct-stars", JSON.stringify(got)); } catch (e) {} };
+    const STAR = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0.8 9.5 6.5 15.2 8 9.5 9.5 8 15.2 6.5 9.5 0.8 8 6.5 6.5Z" fill="currentColor"/></svg>';
+    // header button, shown once the first star is found
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.className = "stars"; btn.setAttribute("aria-expanded", "false"); btn.setAttribute("aria-controls", "starpanel");
+    btn.hidden = !got.length;
+    document.querySelector("header nav").prepend(btn);
+    const panel = document.createElement("div");
+    panel.className = "starpanel"; panel.id = "starpanel"; panel.hidden = true; panel.setAttribute("role", "dialog"); panel.setAttribute("aria-label", "Your constellation");
+    document.body.append(panel);
+    const toast = document.createElement("div");
+    toast.id = "toast"; toast.setAttribute("role", "status"); toast.setAttribute("aria-live", "polite");
+    document.body.append(toast);
+    const label = () => { btn.innerHTML = `${STAR}<span>${got.length} / ${N}</span>`; btn.setAttribute("aria-label", `Your constellation: ${got.length} of ${N} stars found`); };
+    // stars sit on a sunflower spiral; a link appears between two found stars 8 or 13 apart, so the spiral arms fill in as you go
+    const sky = (fresh) => {
+      const S = 220, c = S / 2, k = 15.6, P = LIST.map((d, i) => { const r = k * Math.sqrt(i + 0.5), a = i * 2.39996; return [c + r * Math.cos(a), c + r * Math.sin(a)]; });
+      let lines = "", dots = "";
+      for (let i = 0; i < N; i++) for (const s of [8, 13]) { const j = i + s; if (j < N && has.has(LIST[i][0]) && has.has(LIST[j][0])) lines += `<line x1="${P[i][0].toFixed(1)}" y1="${P[i][1].toFixed(1)}" x2="${P[j][0].toFixed(1)}" y2="${P[j][1].toFixed(1)}"/>`; }
+      LIST.forEach((d, i) => {
+        const [x, y] = P[i];
+        if (has.has(d[0])) dots += `<g class="lit${d[0] === fresh ? " fresh" : ""}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="8" class="halo"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.6"/><title>${d[1]}</title></g>`;
+        else dots += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.3" class="dim"/>`;
+      });
+      return `<svg viewBox="0 0 ${S} ${S}" aria-hidden="true"><g class="links">${lines}</g>${dots}</svg>`;
+    };
+    let armed = false;
+    const render = (fresh) => {
+      const left = N - got.length;
+      panel.innerHTML = `<h2>${left ? "Your constellation" : "Constellation complete"}</h2><div class="sub mono">${got.length} of ${N} stars${left ? ` · ${left} still hidden in the playground` : " · every star found"}</div>${sky(fresh)}<ol>${got.slice().reverse().map(id => { const d = LIST[IDX.get(id)]; return `<li><b>${d[1]}</b><span>${d[2]}</span></li>`; }).join("")}</ol><button type="button" class="forget">${armed ? "Tap again to forget every star" : "Forget my stars"}</button>`;
+      panel.querySelector(".forget").addEventListener("click", e => {
+        e.stopPropagation();
+        if (!armed) { armed = true; render(); return; }
+        armed = false; got = []; has.clear(); save(); label(); closeP(); btn.hidden = true;
+      });
+    };
+    const openP = () => { armed = false; render(); panel.hidden = false; btn.setAttribute("aria-expanded", "true"); };
+    const closeP = () => { panel.hidden = true; btn.setAttribute("aria-expanded", "false"); armed = false; };
+    btn.addEventListener("click", e => { e.stopPropagation(); panel.hidden ? openP() : closeP(); });
+    panel.addEventListener("pointerdown", e => e.stopPropagation());
+    document.addEventListener("pointerdown", e => { if (!panel.hidden && !e.target.closest(".stars")) closeP(); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape" && !panel.hidden) { closeP(); btn.focus(); } });
+    label();
+    // the toast: one at a time, each stays a few seconds
+    const queue = []; let showing = false;
+    const next = () => {
+      if (!queue.length) { showing = false; return; }
+      showing = true; const d = queue.shift();
+      toast.innerHTML = `<span class="tstar">${STAR}</span><span><b>${d[1]}</b> ${d[2]}</span>`;
+      toast.classList.add("show");
+      setTimeout(() => { toast.classList.remove("show"); setTimeout(next, 450); }, 5200);
+    };
+    return id => {
+      if (has.has(id) || !IDX.has(id)) return;
+      has.add(id); got.push(id); save(); label();
+      if (btn.hidden) btn.hidden = false;
+      btn.classList.remove("ping"); void btn.offsetWidth; btn.classList.add("ping");
+      if (!panel.hidden) render(id);
+      queue.push(LIST[IDX.get(id)]); if (!showing) next();
+    };
+  })();
+
+  // ---------- Secrets: small things nobody is told about ----------
+  {
+    // a night owl: after midnight, before four, wherever you are
+    const hr = new Date().getHours(); if (hr < 4) setTimeout(() => find("owl"), 2500);
+    // the magic word
+    let typed = "";
+    document.addEventListener("keydown", e => { if (e.key.length !== 1) return; typed = (typed + e.key.toLowerCase()).slice(-4); if (typed === "cami") find("name"); });
+    // flip day and night six times in a few seconds
+    let flips = [];
+    document.getElementById("mode").addEventListener("click", () => { const now = performance.now(); flips = flips.filter(t => now - t < 4000); flips.push(now); if (flips.length >= 6) find("timelapse"); });
+    // touch the moon
+    document.getElementById("moonic").addEventListener("click", () => find("moon"));
+    // say hello: tap the title three times
+    let hi = 0, hiT = 0;
+    document.querySelector(".hero h1").addEventListener("click", () => { const now = performance.now(); hi = now - hiT < 900 ? hi + 1 : 1; hiT = now; if (hi >= 3) find("hello"); });
+    // a grand tour: every toy seen
+    const places = [document.getElementById("heroband"), ...document.querySelectorAll("main .lab")], seen = new Set();
+    const tio = new IntersectionObserver(es => { for (const e of es) if (e.isIntersecting) seen.add(e.target); if (seen.size === places.length) { find("tour"); tio.disconnect(); } }, { threshold: 0.4 });
+    places.forEach(p => tio.observe(p));
+  }
 
   // ---------- Star field: steady stars, fleeting flares and meteors ----------
   const sky = document.getElementById("sky");
@@ -521,7 +668,8 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
 
   const setPointer = e => { const r = band.getBoundingClientRect(); tpx = (e.clientX - r.left) / r.width; tpy = (e.clientY - r.top) / r.height; lastMove = performance.now(); };
   band.addEventListener("pointermove", setPointer);
-  cv.addEventListener("pointerdown", e => { setPointer(e); pi = (pi + 1) % PRESETS.length; base = PRESETS[pi].slice(); fade = 0.12; });
+  const seenP = new Set([0]);
+  cv.addEventListener("pointerdown", e => { setPointer(e); pi = (pi + 1) % PRESETS.length; base = PRESETS[pi].slice(); fade = 0.12; seenP.add(pi); if (seenP.size === PRESETS.length) find("shapes"); });
 
   build();
   const fieldRO = new ResizeObserver(() => { build(); if (reduceMotion) { for (let i = 0; i < 8; i++) step(0, 60000); render(0); } });
@@ -878,6 +1026,7 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
       eField = ei === NL - 1 ? w0 : w1 / w0 < 1e-6 ? (ez < 5.5 ? w0 : w1) : w0 * Math.pow(w1 / w0, f);
       eName = ez < 5.5 ? LAY[ei][0] : LAY[(ei + 1) % NL][0];
       if (ei === NL - 1 && ez >= 5.5) eName = "…and back to the pond";
+      if (eName.startsWith("Planck")) find("planck"); else if (eName.startsWith("…and back")) find("pond");
     };
     sc.addEventListener("wheel", e => {
       if (!eternal) return;
@@ -977,6 +1126,7 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
           const [wx2, wy2] = toWorld(x, y);
           cells.push({ x: wx2, y: wy2, a: Math.random() * 3.14, t0: performance.now() });
           if (cells.length > 24) cells.shift();
+          if (mag >= 400) find("mitosis");
           hint.textContent = mag < 400 ? "A cell is splitting! Press 400× for a closer look." : "Watch the chromosomes line up in the middle, then pull apart.";
         }
       }
@@ -1028,6 +1178,7 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
         h.stroke();
       }
       h.globalCompositeOperation = "source-over";
+      if (frozen && rl.includes(":")) find("harmony");
       rd2.textContent = `f₂ : f₁ = ${rl} · φ = ${(phi % (2 * Math.PI)).toFixed(2)} · δ = ${d}${frozen ? " · frozen" : ""}`;
       requestAnimationFrame(frame);
     };
@@ -1097,8 +1248,9 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
     cv3.addEventListener("pointermove", e => { if (painting) paint(e); });
     cv3.addEventListener("pointerup", () => { painting = false; });
     cv3.addEventListener("pointercancel", () => { painting = false; });
+    const rdSeen = new Set(["coral"]);
     for (const bt of lab.querySelectorAll(".mag button")) bt.addEventListener("click", () => {
-      [F, K] = PRE[bt.dataset.p]; seed();
+      [F, K] = PRE[bt.dataset.p]; seed(); rdSeen.add(bt.dataset.p); if (rdSeen.size >= 4) find("patterns");
       for (const o2 of lab.querySelectorAll(".mag button")) o2.setAttribute("aria-pressed", o2 === bt ? "true" : "false");
     });
   }
@@ -1282,7 +1434,7 @@ void main(){
       };
       const zoomAt = e => {
         if (tzm >= ZMAX * 0.99) return;
-        [tvx, tvy] = toZ(e); tzm = Math.min(ZMAX, tzm * 3); locked = true; setHint();
+        [tvx, tvy] = toZ(e); tzm = Math.min(ZMAX, tzm * 3); locked = true; setHint(); if (tzm >= ZMAX * 0.99) find("deep");
       };
       const zoomOut = () => { if (tzm <= 3.01) { resetView(); return; } tzm /= 3; setHint(); };
       function resetView(now) { tzm = 1; tvx = tvy = 0; locked = false; if (now) { zm = 1; vx = vy = 0; } setHint(); }
@@ -1371,7 +1523,7 @@ void main(){
       if (raw.length < 8) return;
       raw.push(raw[0]);
       const S = Math.min(FW * 0.42, (FH - 150) * 0.5), cx = FW / 2, cy = 60 + (FH - 120) / 2;
-      load(resample(raw, 320).map(p => [(p[0] - cx) / S, (p[1] - cy) / S]), "your drawing");
+      load(resample(raw, 320).map(p => [(p[0] - cx) / S, (p[1] - cy) / S]), "your drawing"); find("fourier");
     };
     cv5.addEventListener("pointerup", finish); cv5.addEventListener("pointercancel", finish);
     for (const bt of lab.querySelectorAll(".mag button")) bt.addEventListener("click", () => {
@@ -1545,8 +1697,9 @@ void main(){
     let downAt = null;
     cv6.addEventListener("pointermove", e => { food = toTrail(e); if (downAt && Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 8) downAt = null; });
     cv6.addEventListener("pointerleave", () => { food = null; });
-    cv6.addEventListener("pointerdown", e => { downAt = [e.clientX, e.clientY]; if (e.pointerType === "mouse") { const p = toTrail(e); hole = [p[0], p[1], Math.min(TW, TH) * 0.09]; downAt = null; } });
-    cv6.addEventListener("pointerup", e => { if (downAt) { const p = toTrail(e); hole = [p[0], p[1], Math.min(TW, TH) * 0.09]; } downAt = null; if (e.pointerType !== "mouse") food = null; });
+    let tears = 0;
+    cv6.addEventListener("pointerdown", e => { downAt = [e.clientX, e.clientY]; if (e.pointerType === "mouse") { const p = toTrail(e); hole = [p[0], p[1], Math.min(TW, TH) * 0.09]; if (++tears === 3) find("tear"); downAt = null; } });
+    cv6.addEventListener("pointerup", e => { if (downAt) { const p = toTrail(e); hole = [p[0], p[1], Math.min(TW, TH) * 0.09]; if (++tears === 3) find("tear"); } downAt = null; if (e.pointerType !== "mouse") food = null; });
     for (const bt of lab.querySelectorAll(".mag button")) bt.addEventListener("click", () => {
       P = PRE[bt.dataset.p]; reset();
       for (const o2 of lab.querySelectorAll(".mag button")) o2.setAttribute("aria-pressed", o2 === bt ? "true" : "false");
@@ -1633,7 +1786,7 @@ void main(){
     };
     const jag = (a, b2, n) => { const out = []; for (let k = 1; k < n; k++) { const u = k / n; out.push([a[0] + (b2[0] - a[0]) * u + (R() - 0.5) * 7, a[1] + (b2[1] - a[1]) * u + (R() - 0.5) * 7]); } return out; };
     const doStrike = (j, q, now) => {
-      phase = "strike"; tPhase = now; strikes++;
+      phase = "strike"; tPhase = now; strikes++; if (strokes.length) find("rods");
       const [ix, iy] = cc(q); impact = [ix, iy];
       mainPts = [impact, ...jag(impact, [px[j], py[j]], 2), ...pathPts(j, false)];
       // re-strikes: dart leaders run down the same warm channel two or three more times
@@ -1859,6 +2012,7 @@ void main(){
       const shown = [], kk = ((k0 % real.length) + real.length) % real.length;
       for (let j = 0; j < Math.min(18, nbp); j++) shown.push(L[real[(kk + j) % real.length]]);
       const start = kk + 1 + (kk >= NPOS ? 1 : 0);
+      if (hov && mode === "helix" && openA > 0.5) find("unzip");
       rd8.textContent = `bases ${start.toLocaleString()}–${(start + nbp - 1).toLocaleString()} of 16,569 · 5′ ${shown.join("")}… 3′${openA > 0.5 ? " · copying" : ""}${paused ? " · paused" : ""}`;
     };
 
@@ -1866,6 +2020,7 @@ void main(){
     // Corners: A bottom left, C top left, G top right, T bottom right. Each base moves the point halfway to its corner.
     const CX = [0, 0, 1, 1], CY = [0, 1, 1, 0];
     const startFractal = () => {
+      if (mode === "fractal") find("fractal");
       const dark = root.dataset.theme !== "light";
       fs = mode === "fractal" ? real : shuffled; fi = 0; fx = 0.5; fy = 0.5; cell = new Uint16Array(256); fdark = dark;
       fsize = Math.max(120, Math.min(DW - 80, DH - 190)); fox = (DW - fsize) / 2; foy = 78 + (DH - 190 - fsize) / 2;
@@ -2012,6 +2167,8 @@ void main(){
         if (dark && d > 0.55) { g9.fillStyle = `rgba(${lk},${0.12 * d})`; g9.beginPath(); g9.arc(x, y, dot * p * 3.2, 0, 6.2832); g9.fill(); }
       }
       g9.globalCompositeOperation = "source-over";
+      if (locked && Math.abs(ang - GOLD) < 0.05) find("golden");
+      if (locked && Math.abs(ang - GOLD) > 2.5 && Math.abs(ang - tang) < 0.05) find("spokes");
       rd9.textContent = `turn ${ang.toFixed(2)}°${Math.abs(ang - GOLD) < 0.03 ? " = the golden angle, no two points ever line up" : arms()} · ${N} points · ${edges.length} links${locked ? " · locked" : ""}`;
       requestAnimationFrame(frame);
     };
@@ -2037,6 +2194,7 @@ void main(){
       herb: { ax: "F", rules: { F: ["F[+F]F[-F]F", "F[+F]F", "F[-F]F"] }, ang: 25.7, n: 6, lean: 0 }
     };
     const rng = s => () => { s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+    const grownKinds = new Set();
     let LW = 0, LH = 0, vis = false, lastT = 0, kind = "fern", seed = 7, str = "", jit = new Float32Array(0), grow = 0, ang = 25, tang = 25, hov = false;
     let segs = new Float32Array(0), nseg = 0, maxd = 1, maxDepth = 1, sc = 0, ox = 0, oy = 0;
     const size = () => { const r = lab.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1); LW = r.width; LH = r.height; cvL.width = Math.round(LW * dpr); cvL.height = Math.round(LH * dpr); gL.setTransform(dpr, 0, 0, dpr, 0, 0); sc = 0; };
@@ -2085,6 +2243,7 @@ void main(){
       if (!hov) tang = P.ang;
       ang += (tang - ang) * 0.08;
       if (grow < 1) grow = Math.min(1, grow + dt / 4600);
+      else { grownKinds.add(kind); if (grownKinds.size === 4) find("garden"); }
       walk(ang, t);
       gL.clearRect(0, 0, LW, LH);
       gL.globalCompositeOperation = dark ? "lighter" : "source-over"; gL.lineCap = "round";
@@ -2130,7 +2289,7 @@ void main(){
       fish: { word: "fish", sep: 0.42, ali: 0.12, coh: 0.0024, see: 52, min: 1.3, max: 2.5, noise: 0.03, hue: [175, 235] },
       gnats: { word: "gnats", sep: 0.28, ali: 0, coh: 0.011, see: 70, min: 0.6, max: 3.2, noise: 1.1, hue: [35, 75] }
     };
-    let BW = 0, BH = 0, vis = false, lastT = 0, mode = "starlings", N = 0, hawk = false, hx = 0, hy = 0, bait = 0, bx = 0, by = 0, phi = 0;
+    let hawkHold = 0, BW = 0, BH = 0, vis = false, lastT = 0, mode = "starlings", N = 0, hawk = false, hx = 0, hy = 0, bait = 0, bx = 0, by = 0, phi = 0;
     let X = new Float32Array(0), Y = X, VX = X, VY = X, head = new Int32Array(0), next = new Int32Array(0);
     const seedFlock = () => {
       N = Math.max(140, Math.min(340, Math.round(BW * BH / 2300)));
@@ -2205,6 +2364,7 @@ void main(){
       if (bait > 0) { const a = Math.min(1, bait / 600); gB.fillStyle = dark ? `rgba(255,211,138,${a})` : `rgba(138,74,0,${a})`; gB.beginPath(); gB.arc(bx, by, 3, 0, 6.2832); gB.fill(); gB.globalAlpha = a * 0.3; gB.beginPath(); gB.arc(bx, by, 9, 0, 6.2832); gB.fill(); gB.globalAlpha = 1; }
       if (hawk) { gB.strokeStyle = dark ? "rgba(255,255,255,0.10)" : "rgba(20,20,27,0.12)"; gB.lineWidth = 1; gB.setLineDash([3, 6]); gB.beginPath(); gB.arc(hx, hy, 150, 0, 6.2832); gB.stroke(); gB.setLineDash([]); }
       gB.globalCompositeOperation = "source-over";
+      hawkHold = hawk && phi > 0.9 ? hawkHold + dt : 0; if (hawkHold > 2000) find("hawk");
       const mood = phi > 0.85 ? " · moving as one" : phi < 0.3 ? " · milling about" : "";
       rdB.textContent = `${N} ${M.word} · alignment ${phi.toFixed(2)}${mood}${hawk ? " · hawk overhead" : ""}${bait > 0 ? " · bait" : ""}`;
       requestAnimationFrame(frame);
@@ -2213,7 +2373,7 @@ void main(){
     const at = e => { const r = cvB.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
     cvB.addEventListener("pointermove", e => { if (e.pointerType !== "mouse") return; [hx, hy] = at(e); hawk = true; });
     cvB.addEventListener("pointerleave", () => { hawk = false; });
-    cvB.addEventListener("pointerdown", e => { [bx, by] = at(e); bait = 4000; });
+    cvB.addEventListener("pointerdown", e => { [bx, by] = at(e); bait = 4000; if (mode === "fish") find("fish"); });
   }
 
   // ---------- Lab slot 12: fireflies. The Kuramoto model: coupled oscillators that fall into step ----------
@@ -2232,7 +2392,7 @@ void main(){
     const EQ = { local: "dθᵢ/dt = ωᵢ + (K/nᵢ) Σ sin(θⱼ − θᵢ) over the fireflies it can see · it flashes each time θ passes 2π", global: "dθᵢ/dt = ωᵢ + (K/N) Σⱼ sin(θⱼ − θᵢ) · every firefly sees every other · it flashes each time θ passes 2π" };
     const setMode = m => { mode = m; K = tK = KDEF[m]; eqK.textContent = EQ[m]; pbtnK.forEach(b => b.setAttribute("aria-pressed", b.dataset.p === m ? "true" : "false")); };
     pbtnK.forEach(b => b.addEventListener("click", e => { e.stopPropagation(); setMode(b.dataset.p); }));
-    const scatter = () => { for (let i = 0; i < N; i++) { th[i] = Math.random() * TAU; DU[i] += (Math.random() - 0.5) * 0.12; DV[i] += (Math.random() - 0.5) * 0.12; } };
+    const scatter = () => { if (R > 0.9) find("startle"); for (let i = 0; i < N; i++) { th[i] = Math.random() * TAU; DU[i] += (Math.random() - 0.5) * 0.12; DV[i] += (Math.random() - 0.5) * 0.12; } };
     sbtn.addEventListener("click", e => { e.stopPropagation(); scatter(); });
     const region = () => { const l = KW * 0.05, r = KW * 0.95, t = 78, b = KH - 108; return [l, t, Math.max(1, r - l), Math.max(1, b - t)]; };
     const step = h => {
@@ -2279,6 +2439,7 @@ void main(){
         }
       }
       gK.globalAlpha = 1; gK.globalCompositeOperation = "source-over";
+      if (R > 0.95) find("sync");
       const mood = R > 0.8 ? "flashing as one" : R > 0.4 ? "falling into step" : "each on its own";
       rdK.textContent = `K ${K.toFixed(2)}${mode === "global" ? ` · in step above K ≈ ${KC.toFixed(2)}` : ""} · sync r = ${R.toFixed(2)} · ${mood}`;
       requestAnimationFrame(frame);
