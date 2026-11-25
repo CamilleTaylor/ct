@@ -97,12 +97,16 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
 :root[data-zone=four]{--sb1:#5fd6ff;--sb2:#c45cff}
 :root[data-zone=mold]{--sb1:#e45cc0;--sb2:#cdf3ff}
 :root[data-zone=bolt]{--sb1:#8c78ff;--sb2:#eef1ff}
+:root[data-zone=dna]{--sb1:#7ae0ff;--sb2:#ff7ac8}
+:root[data-zone=fibs]{--sb1:#b49aff;--sb2:#ffd38a}
 :root[data-theme=light]{--sb1:#4a2fd1;--sb2:#b0185a}
 :root[data-theme=light][data-zone=scope]{--sb1:#0f766e;--sb2:#2f7d3a}
 :root[data-theme=light][data-zone=julia]{--sb1:#4a2aa8;--sb2:#8a4a00}
 :root[data-theme=light][data-zone=four]{--sb1:#0b5e86;--sb2:#5b3cc4}
 :root[data-theme=light][data-zone=mold]{--sb1:#3a2380;--sb2:#14305f}
 :root[data-theme=light][data-zone=bolt]{--sb1:#4a2fd1;--sb2:#14141b}
+:root[data-theme=light][data-zone=dna]{--sb1:#0b5e86;--sb2:#a0145a}
+:root[data-theme=light][data-zone=fibs]{--sb1:#4a2aa8;--sb2:#8a4a00}
 ::-webkit-scrollbar{width:12px;height:12px}
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--sb1),var(--sb2)) padding-box;border:4px solid transparent;border-radius:99px;min-height:48px}
@@ -170,8 +174,9 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
     <!-- LAB SLOT 04: Julia set explorer. -->
     <div class="lab toylab" id="lab-j">
       <canvas class="toy" id="julia" aria-label="Julia set explorer: the pointer position sets the complex number c"></canvas>
-      <div class="eqn mono"><span>z ↦ z² + c</span><span id="jread"></span></div>
-      <span class="hint mono" id="jhint">Move to choose c · click to lock it</span>
+      <div class="eqn mono"><span id="jeq">z ↦ z² + c · c near i</span><span id="jread"></span></div>
+      <div class="mag mono" role="group" aria-label="Species"><button type="button" data-s="dendrite" aria-pressed="true">Dendrite</button><button type="button" data-s="cell">Cell</button><button type="button" data-s="radiolarian">Radiolarian</button><button type="button" data-s="classic">Classic</button><button type="button" data-z="reset" hidden>Reset view</button></div>
+      <span class="hint mono" id="jhint">Move to choose c · click to zoom in</span>
       <span class="tag mono" aria-hidden="true">Lab · slot 04 · Julia set</span>
     </div>
 
@@ -200,6 +205,24 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
       <div class="mag mono" role="group" aria-label="Discharge"><button type="button" data-p="bolt" aria-pressed="true">Lightning</button><button type="button" data-p="lich">Lichtenberg</button><button type="button" data-act="field" aria-pressed="true">Field</button><button type="button" data-act="clear">Clear</button></div>
       <span class="hint mono">Draw lightning rods · the bolt will find them</span>
       <span class="tag mono" aria-hidden="true">Lab · slot 07 · lightning</span>
+    </div>
+
+    <!-- LAB SLOT 08: DNA, from the human mitochondrial genome. -->
+    <div class="lab toylab" id="lab-dna">
+      <canvas class="toy" id="dna" aria-label="DNA: a double helix built from the human mitochondrial genome. Move along it to open it and watch it copy itself."></canvas>
+      <div class="eqn mono"><span id="deq">B-DNA · 10.5 base pairs per turn · 3.4 Å rise · A pairs with T, G with C</span><span id="dread"></span></div>
+      <div class="mag mono" role="group" aria-label="View"><button type="button" data-m="helix" aria-pressed="true">Helix</button><button type="button" data-m="fractal">Fractal</button><button type="button" data-m="random">Shuffled</button></div>
+      <span class="hint mono" id="dhint">Move along the helix to open it · click to pause</span>
+      <span class="tag mono" aria-hidden="true">Lab · slot 08 · DNA</span>
+    </div>
+
+    <!-- LAB SLOT 09: Fibonacci sphere. -->
+    <div class="lab toylab" id="lab-s">
+      <canvas class="toy" id="fibs" aria-label="Fibonacci sphere: move across it to change the turn between points and see why the golden angle spreads them evenly"></canvas>
+      <div class="eqn mono"><span>point n: turn n × 137.508° · height 1 − (2n + 1)/N · link to the 3 nearest · signals take a random walk</span><span id="sread"></span></div>
+      <div class="mag mono" role="group" aria-label="Points"><button type="button" data-n="89">89</button><button type="button" data-n="233" aria-pressed="true">233</button><button type="button" data-n="610">610</button><button type="button" data-act="links" aria-pressed="true">Links</button></div>
+      <span class="hint mono" id="shint">Move across to change the angle · click to lock it</span>
+      <span class="tag mono" aria-hidden="true">Lab · slot 09 · Fibonacci sphere</span>
     </div>
   </div>
 </main>
@@ -1035,60 +1058,202 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
   }
 
   // ---------- Lab slot 04: Julia set explorer ----------
+  // Renders on the GPU at full screen resolution; falls back to the old CPU version without WebGL.
   {
-    const lab = document.getElementById("lab-j"), cv4 = document.getElementById("julia"), j = cv4.getContext("2d"), rd4 = document.getElementById("jread");
-    let JW = 0, JH = 0, GX = 0, GY = 0, glow = document.createElement("canvas"), gc = glow.getContext("2d"), off = document.createElement("canvas"), oc = off.getContext("2d"), img, vis = false, locked = false;
-    let th = 2.1, rr = 0.985, tth = th, trr = rr, lastC = "";
-    const size = () => {
-      const r = lab.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
-      JW = r.width; JH = r.height; cv4.width = Math.round(JW * dpr); cv4.height = Math.round(JH * dpr); j.setTransform(dpr, 0, 0, dpr, 0, 0);
-      GX = JW < 600 ? 170 : 300; GY = Math.round(GX * JH / JW); off.width = GX; off.height = GY; glow.width = Math.ceil(GX / 6); glow.height = Math.ceil(GY / 6); img = oc.createImageData(GX, GY); lastC = "";
-    };
-    size(); const ro = new ResizeObserver(size); ro.observe(lab);
-    const MAXI = 110, L2 = Math.log(2);
-    const render = (cr, ci, dark) => {
-      const d = img.data, sc = Math.max(2.7 / Math.min(GX, GY), 3.1 / GX), ox = GX / 2, oy = GY * 0.54;
-      for (let py = 0; py < GY; py++) for (let px = 0; px < GX; px++) {
-        let x = (px - ox) * sc, y = (py - oy) * sc, i = 0, x2 = x * x, y2 = y * y;
-        while (i < MAXI && x2 + y2 < 256) { y = 2 * x * y + ci; x = x2 - y2 + cr; x2 = x * x; y2 = y * y; i++; }
-        const k = (py * GX + px) * 4;
-        if (i >= MAXI) { d[k + 3] = 0; continue; }
-        const mu = i + 1 - Math.log(Math.log(x2 + y2) / 2 / L2) / L2, t = Math.max(0, mu / MAXI);
-        const a = Math.min(1, Math.pow(t * 5, 1.6));
-        if (dark) {
-          const h = 250 + t * 220, l = 0.35 + 0.55 * Math.min(1, t * 3);
-          const [rC, gC, bC] = hsl(h % 360, 0.85, l);
-          d[k] = rC; d[k + 1] = gC; d[k + 2] = bC; d[k + 3] = a * 255;
-        } else {
-          const [rC, gC, bC] = hsl((240 + t * 120) % 360, 0.65, 0.22 + t * 0.2);
-          d[k] = rC; d[k + 1] = gC; d[k + 2] = bC; d[k + 3] = a * 235;
+    const lab = document.getElementById("lab-j"), cv4 = document.getElementById("julia"), rd4 = document.getElementById("jread"), eq4 = document.getElementById("jeq"), hint4 = document.getElementById("jhint"), sbtn = [...lab.querySelectorAll(".mag button[data-s]")], zbtn = lab.querySelector('.mag button[data-z="reset"]');
+    const gl = cv4.getContext("webgl", { premultipliedAlpha: true, alpha: true, antialias: false });
+    if (!gl) {
+      lab.querySelector(".mag").hidden = true; eq4.textContent = "z ↦ z² + c"; hint4.textContent = "Move to choose c · click to lock it";
+      const j = cv4.getContext("2d");
+      let JW = 0, JH = 0, GX = 0, GY = 0, glow = document.createElement("canvas"), gc = glow.getContext("2d"), off = document.createElement("canvas"), oc = off.getContext("2d"), img, vis = false, locked = false;
+      let th = 2.1, rr = 0.985, tth = th, trr = rr, lastC = "";
+      const size = () => {
+        const r = lab.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
+        JW = r.width; JH = r.height; cv4.width = Math.round(JW * dpr); cv4.height = Math.round(JH * dpr); j.setTransform(dpr, 0, 0, dpr, 0, 0);
+        GX = JW < 600 ? 170 : 300; GY = Math.round(GX * JH / JW); off.width = GX; off.height = GY; glow.width = Math.ceil(GX / 6); glow.height = Math.ceil(GY / 6); img = oc.createImageData(GX, GY); lastC = "";
+      };
+      size(); const ro = new ResizeObserver(size); ro.observe(lab);
+      const MAXI = 110, L2 = Math.log(2);
+      const render = (cr, ci, dark) => {
+        const d = img.data, sc = Math.max(2.7 / Math.min(GX, GY), 3.1 / GX), ox = GX / 2, oy = GY * 0.54;
+        for (let py = 0; py < GY; py++) for (let px = 0; px < GX; px++) {
+          let x = (px - ox) * sc, y = (py - oy) * sc, i = 0, x2 = x * x, y2 = y * y;
+          while (i < MAXI && x2 + y2 < 256) { y = 2 * x * y + ci; x = x2 - y2 + cr; x2 = x * x; y2 = y * y; i++; }
+          const k = (py * GX + px) * 4;
+          if (i >= MAXI) { d[k + 3] = 0; continue; }
+          const mu = i + 1 - Math.log(Math.log(x2 + y2) / 2 / L2) / L2, t = Math.max(0, mu / MAXI);
+          const a = Math.min(1, Math.pow(t * 5, 1.6));
+          if (dark) {
+            const h = 250 + t * 220, l = 0.35 + 0.55 * Math.min(1, t * 3);
+            const [rC, gC, bC] = hsl(h % 360, 0.85, l);
+            d[k] = rC; d[k + 1] = gC; d[k + 2] = bC; d[k + 3] = a * 255;
+          } else {
+            const [rC, gC, bC] = hsl((240 + t * 120) % 360, 0.65, 0.22 + t * 0.2);
+            d[k] = rC; d[k + 1] = gC; d[k + 2] = bC; d[k + 3] = a * 235;
+          }
         }
+        oc.putImageData(img, 0, 0);
+        gc.clearRect(0, 0, glow.width, glow.height); gc.imageSmoothingEnabled = true; gc.drawImage(off, 0, 0, glow.width, glow.height);
+      };
+      const hsl = (h, s, l) => { const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c / 2; let r = 0, g = 0, b = 0; if (h < 60) [r, g] = [c, x]; else if (h < 120) [r, g] = [x, c]; else if (h < 180) [g, b] = [c, x]; else if (h < 240) [g, b] = [x, c]; else if (h < 300) [r, b] = [x, c]; else [r, b] = [c, x]; return [(r + m) * 255, (g + m) * 255, (b + m) * 255]; };
+      const frame = t => {
+        if (!vis) return;
+        const dark = root.dataset.theme !== "light";
+        if (!locked) {
+          if (!hov && !reduceMotion) tth += 0.0016;
+          th += (tth - th) * 0.06; rr += (trr - rr) * 0.06;
+        }
+        const cr = rr * (Math.cos(th) / 2 - Math.cos(2 * th) / 4), ci = rr * (Math.sin(th) / 2 - Math.sin(2 * th) / 4);
+        const key = cr.toFixed(4) + ci.toFixed(4) + dark + GX;
+        if (key !== lastC) { render(cr, ci, dark); lastC = key; }
+        j.clearRect(0, 0, JW, JH); j.imageSmoothingEnabled = true;
+        if (dark) { j.globalCompositeOperation = "lighter"; j.globalAlpha = 0.6; j.drawImage(glow, 0, 0, JW, JH); j.globalAlpha = 1; }
+        j.drawImage(off, 0, 0, JW, JH); j.globalCompositeOperation = "source-over";
+        rd4.textContent = `classic (no WebGL) · c = ${cr.toFixed(4)} ${ci < 0 ? "−" : "+"} ${Math.abs(ci).toFixed(4)}i · |c| = ${Math.hypot(cr, ci).toFixed(3)} · ${MAXI} iterations${locked ? " · locked" : ""}`;
+        requestAnimationFrame(frame);
+      };
+      const io = new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !vis) { vis = true; requestAnimationFrame(frame); } if (!v) vis = false; }); io.observe(lab);
+      let hov = false;
+      cv4.addEventListener("pointermove", e => { if (locked) return; hov = true; const r = cv4.getBoundingClientRect(); tth = Math.PI * 0.15 + (e.clientX - r.left) / r.width * Math.PI * 1.7; trr = 0.9 + (1 - (e.clientY - r.top) / r.height) * 0.16; });
+      cv4.addEventListener("pointerleave", () => { hov = false; });
+      cv4.addEventListener("pointerdown", e => { if (e.pointerType !== "mouse") { const r = cv4.getBoundingClientRect(); tth = Math.PI * 0.15 + (e.clientX - r.left) / r.width * Math.PI * 1.7; trr = 0.9 + (1 - (e.clientY - r.top) / r.height) * 0.16; hov = true; return; } locked = !locked; });
+
+    } else {
+      // Four species. c(θ, r) is where the pointer puts c; r(y) maps pointer height to r.
+      const SP = {
+        dendrite: { mode: 0, iter: 320, span: 3.0, cy: 0.48, eq: "z ↦ z² + c · c near i", c: (t, r) => [-0.05 + r * Math.cos(t), 0.98 + r * Math.sin(t)], r: y => 0.02 + y * 0.09, r0: 0.05 },
+        cell: { mode: 2, iter: 220, span: 3.4, cy: 0.48, eq: "z ↦ z² + c · orbit traps", c: (t, r) => [-1 + r * Math.cos(t), r * Math.sin(t)], r: y => 0.04 + y * 0.17, r0: 0.12 },
+        radiolarian: { mode: 1, iter: 14, span: 4.5, cy: 0.5, eq: "z ↦ z³ + c · Pickover biomorph", c: (t, r) => [0.5 + r * Math.cos(t), r * Math.sin(t)], r: y => 0.02 + y * 0.11, r0: 0.06 },
+        classic: { mode: 0, iter: 260, span: 3.1, cy: 0.46, eq: "z ↦ z² + c", c: (t, r) => [r * (Math.cos(t) / 2 - Math.cos(2 * t) / 4), r * (Math.sin(t) / 2 - Math.sin(2 * t) / 4)], r: y => 0.9 + y * 0.16, r0: 0.985 }
+      };
+      let sp = SP.dendrite, th = 2.1, rr = sp.r0, tth = th, trr = rr, lastC = "", vis = false, locked = false, hov = false, q = 1, slow = 0, lastT = 0;
+      // View: zoom level and centre (complex plane), eased toward targets. Float32 on the GPU blurs past ~4,000x, so cap there.
+      const ZMAX = 3 ** 7.5; let zm = 1, tzm = 1, vx = 0, vy = 0, tvx = 0, tvy = 0, down = null;
+      const touchy = window.matchMedia("(hover: none)").matches;
+      const VS = "attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
+      const FS = `precision highp float;
+uniform vec2 uC,uOff,uCen;uniform float uPix,uDark;uniform int uMode,uIter;
+vec2 cm(vec2 a,vec2 b){return vec2(a.x*b.x-a.y*b.y,a.x*b.y+a.y*b.x);}
+const vec3 VI=vec3(.604,.361,1.),AM=vec3(1.,.827,.541),MG=vec3(.92,.38,.78),INK=vec3(.29,.165,.66),INK2=vec3(.54,.29,0.);
+void main(){
+  vec2 p=(gl_FragCoord.xy-uOff)*uPix+uCen;
+  vec3 col=vec3(0.);float a=0.;
+  if(uMode==1){
+    // Pickover biomorph: z -> z^3 + c, keep points where |Re z| or |Im z| stays small
+    vec2 z=p;float n=0.,tc=1e9,tp=1e9;
+    for(int i=0;i<64;i++){if(i>=uIter)break;z=cm(cm(z,z),z)+uC;n+=1.;tc=min(tc,abs(length(z)-.6));tp=min(tp,length(z-vec2(.25,.1)));if(abs(z.x)>10.||abs(z.y)>10.||dot(z,z)>100.)break;}
+    float m=min(abs(z.x),abs(z.y));
+    if(n>=float(uIter)-.5){
+      float mem=exp(-tc*45.),nu=exp(-tp*22.),rg=.5+.5*sin(tc*60.);
+      col=mix(VI*.5,MG*.8,rg*.35);col=mix(col,AM,mem*.85);col=mix(col,vec3(1.,.95,.88),nu*.8);a=.3+.12*rg+.55*max(mem,nu);
+    } else if(m<10.&&n>1.5){
+      float f=n/float(uIter);
+      float rim=1.-smoothstep(0.,10.,m);
+      float shell=.5+.5*cos(n*1.3);
+      col=mix(VI,AM,clamp(rim*1.2-.1,0.,1.));col=mix(col,MG,shell*.35*(1.-rim));
+      a=clamp(.25+.75*pow(rim,.6),0.,1.)*(.55+.45*f);
+    }
+  } else {
+    vec2 z=p,dz=vec2(1.,0.);float m2=dot(z,z),n=0.,tc=1e9,tp=1e9;bool esc=false;
+    for(int i=0;i<1024;i++){if(i>=uIter)break;dz=2.*cm(z,dz);z=cm(z,z)+uC;m2=dot(z,z);n+=1.;
+      tc=min(tc,abs(sqrt(m2)-.45));tp=min(tp,length(z-vec2(.18,.08)));
+      if(m2>1e6){esc=true;break;}}
+    if(esc){
+      float d=.5*sqrt(m2/max(dot(dz,dz),1e-30))*log(m2),t=d/uPix;
+      float mu=n+1.-log2(log(m2)*.5/.6931);
+      float core=exp(-t*2.2),mid=exp(-t*.3),halo=exp(-t*.035);
+      vec3 hc=mix(VI,MG,.5+.5*sin(mu*.22));
+      vec3 cc=mix(AM,vec3(1.,.6,.8),.5+.5*sin(mu*.18));col=mix(hc,cc,clamp(core*1.3,0.,1.));a=clamp(core*.95+mid*.45+halo*.16,0.,1.);
+    } else {
+      if(uMode==2){
+        float mem=exp(-tc*70.),nuc=exp(-tp*30.),cyt=.5+.5*sin(tc*55.);
+        col=mix(VI*.5,MG*.8,cyt*.3);col=mix(col,AM,mem*.9);col=mix(col,vec3(1.,.95,.88),nuc*.8);
+        a=.3+.12*cyt+.58*max(mem,nuc);
+      } else {
+        float g=exp(-tc*6.);col=mix(VI*.45,MG*.7,g);a=.16+.22*g;
       }
-      oc.putImageData(img, 0, 0);
-      gc.clearRect(0, 0, glow.width, glow.height); gc.imageSmoothingEnabled = true; gc.drawImage(off, 0, 0, glow.width, glow.height);
-    };
-    const hsl = (h, s, l) => { const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c / 2; let r = 0, g = 0, b = 0; if (h < 60) [r, g] = [c, x]; else if (h < 120) [r, g] = [x, c]; else if (h < 180) [g, b] = [c, x]; else if (h < 240) [g, b] = [x, c]; else if (h < 300) [r, b] = [x, c]; else [r, b] = [c, x]; return [(r + m) * 255, (g + m) * 255, (b + m) * 255]; };
-    const frame = t => {
-      if (!vis) return;
-      const dark = root.dataset.theme !== "light";
-      if (!locked) {
-        if (!hov && !reduceMotion) tth += 0.0016;
-        th += (tth - th) * 0.06; rr += (trr - rr) * 0.06;
-      }
-      const cr = rr * (Math.cos(th) / 2 - Math.cos(2 * th) / 4), ci = rr * (Math.sin(th) / 2 - Math.sin(2 * th) / 4);
-      const key = cr.toFixed(4) + ci.toFixed(4) + dark + GX;
-      if (key !== lastC) { render(cr, ci, dark); lastC = key; }
-      j.clearRect(0, 0, JW, JH); j.imageSmoothingEnabled = true;
-      if (dark) { j.globalCompositeOperation = "lighter"; j.globalAlpha = 0.6; j.drawImage(glow, 0, 0, JW, JH); j.globalAlpha = 1; }
-      j.drawImage(off, 0, 0, JW, JH); j.globalCompositeOperation = "source-over";
-      rd4.textContent = `c = ${cr.toFixed(4)} ${ci < 0 ? "−" : "+"} ${Math.abs(ci).toFixed(4)}i · |c| = ${Math.hypot(cr, ci).toFixed(3)} · ${MAXI} iterations${locked ? " · locked" : ""}`;
-      requestAnimationFrame(frame);
-    };
-    const io = new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !vis) { vis = true; requestAnimationFrame(frame); } if (!v) vis = false; }); io.observe(lab);
-    let hov = false;
-    cv4.addEventListener("pointermove", e => { if (locked) return; hov = true; const r = cv4.getBoundingClientRect(); tth = Math.PI * 0.15 + (e.clientX - r.left) / r.width * Math.PI * 1.7; trr = 0.9 + (1 - (e.clientY - r.top) / r.height) * 0.16; });
-    cv4.addEventListener("pointerleave", () => { hov = false; });
-    cv4.addEventListener("pointerdown", e => { if (e.pointerType !== "mouse") { const r = cv4.getBoundingClientRect(); tth = Math.PI * 0.15 + (e.clientX - r.left) / r.width * Math.PI * 1.7; trr = 0.9 + (1 - (e.clientY - r.top) / r.height) * 0.16; hov = true; return; } locked = !locked; });
+    }
+  }
+  if(uDark<.5){col=mix(INK,INK2,clamp((col.r-col.b)*1.5+.3,0.,1.));a*=.92;}
+  gl_FragColor=vec4(col*a,a);
+}`;
+      const sh = (t, src) => { const o = gl.createShader(t); gl.shaderSource(o, src); gl.compileShader(o); return o; };
+      const pr = gl.createProgram(); gl.attachShader(pr, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(pr); gl.useProgram(pr);
+      const vb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vb); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      const al = gl.getAttribLocation(pr, "a"); gl.enableVertexAttribArray(al); gl.vertexAttribPointer(al, 2, gl.FLOAT, false, 0, 0);
+      const U = n => gl.getUniformLocation(pr, n), uC = U("uC"), uOff = U("uOff"), uCen = U("uCen"), uPix = U("uPix"), uDark = U("uDark"), uMode = U("uMode"), uIter = U("uIter");
+      const small = () => Math.min(lab.clientWidth, lab.clientHeight) < 600;
+      const size = () => {
+        const r = lab.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
+        let w = r.width * dpr * q, h = r.height * dpr * q; const cap = 3.2e6 / (w * h); if (cap < 1) { w *= Math.sqrt(cap); h *= Math.sqrt(cap); }
+        cv4.width = Math.round(w); cv4.height = Math.round(h); lastC = "";
+      };
+      size(); new ResizeObserver(size).observe(lab);
+      const setSpecies = name => {
+        sp = SP[name]; trr = rr = sp.r0; lastC = ""; eq4.textContent = sp.eq; resetView(true);
+        sbtn.forEach(b => b.setAttribute("aria-pressed", b.dataset.s === name ? "true" : "false"));
+      };
+      sbtn.forEach(b => b.addEventListener("click", e => { e.stopPropagation(); setSpecies(b.dataset.s); }));
+      const frame = now => {
+        if (!vis) return;
+        const dark = root.dataset.theme !== "light";
+        if (!locked) {
+          if (!hov && !reduceMotion) tth += 0.0016;
+          th += (tth - th) * 0.06; rr += (trr - rr) * 0.06;
+        }
+        const lz = Math.log(zm), tlz = Math.log(tzm);
+        if (Math.abs(tlz - lz) < 1e-4 && Math.abs(tvx - vx) < 1e-9 / tzm && Math.abs(tvy - vy) < 1e-9 / tzm) { zm = tzm; vx = tvx; vy = tvy; }
+        else { const k = reduceMotion ? 1 : 0.12; zm = Math.exp(lz + (tlz - lz) * k); vx += (tvx - vx) * k; vy += (tvy - vy) * k; }
+        const lv = Math.log2(zm), base = small() && sp.mode !== 1 ? Math.round(sp.iter * 0.7) : sp.iter;
+        const [cr, ci] = sp.c(th, rr), it = sp.mode === 1 ? Math.min(60, Math.round(base + 3 * lv)) : Math.min(1000, Math.round(base + 60 * lv));
+        const key = cr.toFixed(5) + ci.toFixed(5) + dark + cv4.width + sp.eq + zm + "," + vx + "," + vy;
+        if (key !== lastC) {
+          const W = cv4.width, H = cv4.height; gl.viewport(0, 0, W, H);
+          gl.uniform2f(uC, cr, ci); gl.uniform2f(uOff, W / 2, H * (1 - sp.cy)); gl.uniform2f(uCen, vx, vy); gl.uniform1f(uPix, sp.span / Math.min(W, H) / zm);
+          gl.uniform1f(uDark, dark ? 1 : 0); gl.uniform1i(uMode, sp.mode); gl.uniform1i(uIter, it);
+          gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); gl.drawArrays(gl.TRIANGLES, 0, 3);
+          lastC = key;
+          // If the GPU can't keep up, drop the resolution a step (never below half).
+          if (lastT && now - lastT > 34) { if (++slow > 20 && q > 0.5) { q = Math.max(0.5, q * 0.8); slow = 0; size(); } } else slow = Math.max(0, slow - 1);
+        }
+        lastT = now;
+        rd4.textContent = `c = ${cr.toFixed(4)} ${ci < 0 ? "−" : "+"} ${Math.abs(ci).toFixed(4)}i · ${it} iterations · ${zm > 1.01 ? (zm < 10 ? zm.toFixed(1) : Math.round(zm).toLocaleString()) + "× zoom" : cv4.width + "×" + cv4.height + " px"}${locked && zm <= 1.01 ? " · locked" : ""}`;
+        requestAnimationFrame(frame);
+      };
+      const io = new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !vis) { vis = true; lastT = 0; requestAnimationFrame(frame); } if (!v) vis = false; }); io.observe(lab);
+      const aim = e => { const r = cv4.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = 1 - (e.clientY - r.top) / r.height; tth = sp === SP.classic ? Math.PI * 0.15 + x * Math.PI * 1.7 : x * Math.PI * 2; trr = sp.r(Math.min(1, Math.max(0, y))); };
+      // Point under the pointer, in the complex plane, using the target view (so quick repeat clicks stay accurate).
+      const toZ = e => {
+        const r = cv4.getBoundingClientRect(), W = cv4.width, H = cv4.height, pix = sp.span / Math.min(W, H) / tzm;
+        const gx = (e.clientX - r.left) / r.width * W, gy = (1 - (e.clientY - r.top) / r.height) * H;
+        return [tvx + (gx - W / 2) * pix, tvy + (gy - H * (1 - sp.cy)) * pix];
+      };
+      const setHint = () => {
+        const z = tzm > 1.01;
+        zbtn.hidden = !z;
+        hint4.textContent = z ? (tzm >= ZMAX * 0.99 ? "That’s as deep as the GPU’s numbers go · Reset view" : (touchy ? "Tap to zoom deeper · Reset view to back out" : "Click to zoom deeper · right-click to back out"))
+          : (touchy ? "Drag to choose c · tap to zoom in" : "Move to choose c · click to zoom in");
+      };
+      const zoomAt = e => {
+        if (tzm >= ZMAX * 0.99) return;
+        [tvx, tvy] = toZ(e); tzm = Math.min(ZMAX, tzm * 3); locked = true; setHint();
+      };
+      const zoomOut = () => { if (tzm <= 3.01) { resetView(); return; } tzm /= 3; setHint(); };
+      function resetView(now) { tzm = 1; tvx = tvy = 0; locked = false; if (now) { zm = 1; vx = vy = 0; } setHint(); }
+      setHint();
+      cv4.addEventListener("pointerdown", e => { if (e.button === 2) return; down = { x: e.clientX, y: e.clientY, moved: false }; });
+      cv4.addEventListener("pointermove", e => {
+        if (down && Math.hypot(e.clientX - down.x, e.clientY - down.y) > 8) down.moved = true;
+        if (tzm > 1.01) return; // zoomed in: c stays put
+        if (e.pointerType === "mouse" || (down && down.moved)) { hov = true; aim(e); }
+      });
+      cv4.addEventListener("pointerup", e => { const d = down; down = null; if (d && !d.moved && e.button !== 2) zoomAt(e); });
+      cv4.addEventListener("pointerleave", () => { hov = false; });
+      cv4.addEventListener("pointercancel", () => { down = null; });
+      cv4.addEventListener("contextmenu", e => { e.preventDefault(); if (tzm > 1.01) zoomOut(); });
+      zbtn.addEventListener("click", e => { e.stopPropagation(); resetView(); });
+      cv4.addEventListener("webglcontextlost", e => e.preventDefault());
+    }
   }
 
   // ---------- Lab slot 05: Fourier epicycles ----------
@@ -1570,6 +1735,247 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
     });
   }
 
+  // ---------- Lab slot 08: DNA. A B-DNA helix built from the human mitochondrial genome, and its chaos game fractal ----------
+  {
+    const lab = document.getElementById("lab-dna"), cv8 = document.getElementById("dna"), g8 = cv8.getContext("2d"), rd8 = document.getElementById("dread"), eq8 = document.getElementById("deq"), hint8 = document.getElementById("dhint");
+    const mbtn = [...lab.querySelectorAll(".mag button")];
+    // Human mitochondrial DNA, revised Cambridge Reference Sequence (NC_012920.1), 16,569 bases packed 2 bits each (A=0 C=1 G=2 T=3).
+    // Position 3107 is the reference's placeholder "N" and is skipped.
+    const B64 = "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";
+    const N = 16569, NPOS = 3106, L = "ACGT", COMP = [3, 2, 1, 0];
+    const GEN = (() => { const b = atob(B64), s = new Uint8Array(N); for (let i = 0; i < N; i++) s[i] = (b.charCodeAt(i >> 2) >> ((i & 3) * 2)) & 3; return s; })();
+    const real = [], counts = [0, 0, 0, 0];
+    for (let i = 0; i < N; i++) if (i !== NPOS) { real.push(GEN[i]); counts[GEN[i]]++; }
+    // Same letters in shuffled order: the fractal of a genome with no order, for comparison.
+    const shuffled = (() => { const a = real.slice(); let seed = 20260211; const R = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296; for (let i = a.length - 1; i > 0; i--) { const j = (R() * (i + 1)) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; })();
+    const pairCount = (s, x, y) => { let c = 0; for (let i = 1; i < s.length; i++) if (s[i - 1] === x && s[i] === y) c++; return c; };
+    const CG_REAL = pairCount(real, 1, 2), CG_SHUF = pairCount(shuffled, 1, 2), CG_EXP = Math.round(counts[1] * counts[2] / (real.length - 1));
+    const P = counts.map(c => c / real.length);
+
+    let mode = "helix", DW = 0, DH = 0, dpr = 1, vis = false, mx = -1e4, my = -1e4, hov = false, paused = false, openA = 0;
+    let pos = 0, spin = 0, lastT = 0;
+    // Fractal state
+    const acc = document.createElement("canvas"), ac = acc.getContext("2d"); let fs = [], fi = 0, fx = 0.5, fy = 0.5, fsize = 0, fox = 0, foy = 0, cell = new Uint16Array(256), fdark = null;
+    const size = () => {
+      const r = lab.getBoundingClientRect(); dpr = Math.min(2, window.devicePixelRatio || 1);
+      DW = r.width; DH = r.height; cv8.width = Math.round(DW * dpr); cv8.height = Math.round(DH * dpr); g8.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (mode !== "helix") startFractal();
+    };
+    const COL = dark => dark ? ["#ffd38a", "#b48cff", "#7ae0ff", "#ff7ac8"] : ["#8a4a00", "#4a2aa8", "#0b5e86", "#a0145a"];
+
+    // ----- Helix -----
+    // B-DNA: 10.5 base pairs per turn, 3.4 Å rise per base pair, backbone radius about 10 Å.
+    // The second strand sits about 0.4 of a turn round from the first, which opens the minor and major grooves.
+    const TW = 2 * Math.PI / 10.5, RISE = 3.4, RAD = 10, OFF = 0.4 * 2 * Math.PI;
+    const drawHelix = (dt, dark) => {
+      const col = COL(dark), ink = dark ? "255,255,255" : "20,20,27";
+      const nbp = Math.max(10, Math.min(30, Math.round(DW / 48))), ppa = Math.min((DW - 120) / (nbp * RISE), DH * 0.17 / RAD), R = RAD * ppa, cy = DH * 0.47, x0 = (DW - nbp * RISE * ppa) / 2;
+      if (!paused && !reduceMotion) { pos += dt * 0.0016; spin += dt * 0.00025; }
+      openA += ((hov ? 1 : 0) - openA) * 0.06;
+      const k0 = Math.floor(pos), fr = pos - k0, dots = [];
+      const sep = R * 1.25, bw = 3.2 * RISE * ppa;
+      const put = (x, y, z, r, c, a) => dots.push([x, y, z, r, c, a]);
+      const at = (u, ph) => { const x = x0 + (u - fr) * RISE * ppa; return [x, cy + R * Math.cos(ph), R * Math.sin(ph)]; };
+      for (let j = -1; j <= nbp + 1; j++) {
+        const k = ((k0 + j) % real.length + real.length) % real.length, b1 = real[k], b2 = COMP[b1];
+        const xj = x0 + (j - fr) * RISE * ppa, o = openA * Math.exp(-(((xj - mx) / bw) ** 2)), copy = Math.min(1, Math.max(0, (o - 0.3) / 0.55));
+        const ph = (k0 + j) * TW + spin;
+        // backbones: three beads per base pair along each strand
+        for (let s = 0; s < 5; s++) {
+          const u = j + s / 5, p1 = ph + (s / 5) * TW, p2 = p1 + OFF;
+          const [ax, ay, az] = at(u, p1), [bx, by, bz] = at(u, p2), xs = x0 + (u - fr) * RISE * ppa, os = openA * Math.exp(-(((xs - mx) / bw) ** 2)), cs = Math.min(1, Math.max(0, (os - 0.3) / 0.55)), d = os * sep;
+          const big = s === 0 ? 2.1 : 1.3;
+          put(ax, ay - d, az, big, ink, 0.9);
+          put(bx, by + d, bz, big, ink, 0.9);
+          if (cs > 0) { put(bx, by - d, bz, big, dark ? "180,140,255" : "74,42,168", 0.75 * cs); put(ax, ay + d, az, big, dark ? "180,140,255" : "74,42,168", 0.75 * cs); }
+        }
+        // base pair rung: strand 1's half in its base colour, strand 2's half in the complement's
+        const [ax, ay, az] = at(j, ph), [bx, by, bz] = at(j, ph + OFF), d = o * sep;
+        for (let s = 1; s <= 10; s++) {
+          const t = s / 11, x = ax + (bx - ax) * t, y = ay + (by - ay) * t, z = az + (bz - az) * t, half = t < 0.5;
+          const gap = Math.abs(t - 0.5) < 0.05;
+          if (gap) { if (o < 0.25) put(x, y, z, 0.8, ink, 0.35); continue; }
+          // original strands carry their half-bases away; the new copies grow the missing halves
+          if (half) { put(x, y - d, z, 1.7, col[b1], 0.95); if (copy > 0) put(x, y + d, z, 1.7, col[b1], 0.95 * copy); }
+          else { put(x, y + d, z, 1.7, col[b2], 0.95); if (copy > 0) put(x, y - d, z, 1.7, col[b2], 0.95 * copy); }
+        }
+      }
+      dots.sort((p, q) => p[2] - q[2]);
+      g8.globalCompositeOperation = dark ? "lighter" : "source-over";
+      for (const [x, y, z, r, c, a] of dots) {
+        const depth = (z / R + 1) / 2, rr = r * (0.75 + 0.5 * depth) * Math.max(1, ppa / 10);
+        g8.globalAlpha = a * (0.35 + 0.65 * depth);
+        g8.fillStyle = c[0] === "#" ? c : `rgb(${c})`;
+        g8.beginPath(); g8.arc(x, y, rr, 0, 6.2832); g8.fill();
+        if (dark && r > 1.5 && depth > 0.6) { g8.globalAlpha *= 0.18; g8.beginPath(); g8.arc(x, y, rr * 3, 0, 6.2832); g8.fill(); }
+      }
+      g8.globalCompositeOperation = "source-over"; g8.globalAlpha = 1;
+      const shown = [], kk = ((k0 % real.length) + real.length) % real.length;
+      for (let j = 0; j < Math.min(18, nbp); j++) shown.push(L[real[(kk + j) % real.length]]);
+      const start = kk + 1 + (kk >= NPOS ? 1 : 0);
+      rd8.textContent = `bases ${start.toLocaleString()}–${(start + nbp - 1).toLocaleString()} of 16,569 · 5′ ${shown.join("")}… 3′${openA > 0.5 ? " · copying" : ""}${paused ? " · paused" : ""}`;
+    };
+
+    // ----- Chaos game fractal -----
+    // Corners: A bottom left, C top left, G top right, T bottom right. Each base moves the point halfway to its corner.
+    const CX = [0, 0, 1, 1], CY = [0, 1, 1, 0];
+    const startFractal = () => {
+      const dark = root.dataset.theme !== "light";
+      fs = mode === "fractal" ? real : shuffled; fi = 0; fx = 0.5; fy = 0.5; cell = new Uint16Array(256); fdark = dark;
+      fsize = Math.max(120, Math.min(DW - 80, DH - 190)); fox = (DW - fsize) / 2; foy = 78 + (DH - 190 - fsize) / 2;
+      acc.width = Math.round(fsize * dpr); acc.height = Math.round(fsize * dpr); ac.setTransform(dpr, 0, 0, dpr, 0, 0); ac.clearRect(0, 0, fsize, fsize);
+    };
+    const drawFractal = (dark) => {
+      if (dark !== fdark) startFractal();
+      const col = COL(dark), n = reduceMotion ? fs.length : (fi < 300 ? 3 : fi < 2000 ? 40 : 160);
+      ac.globalCompositeOperation = dark ? "lighter" : "source-over";
+      const end = Math.min(fs.length, fi + n), dot = Math.max(1.5, fsize / 240);
+      let px = fx, py = fy;
+      for (; fi < end; fi++) {
+        const b = fs[fi]; px = (px + CX[b]) / 2; py = (py + CY[b]) / 2;
+        cell[Math.min(15, (py * 16) | 0) * 16 + Math.min(15, (px * 16) | 0)]++;
+        ac.globalAlpha = dark ? 0.42 : 0.38; ac.fillStyle = col[b];
+        ac.fillRect(px * fsize - dot / 2, (1 - py) * fsize - dot / 2, dot, dot);
+      }
+      const lx = fx, ly = fy; fx = px; fy = py;
+      g8.globalAlpha = 1; g8.drawImage(acc, fox, foy, fsize, fsize);
+      const ink = dark ? "255,255,255" : "20,20,27";
+      g8.strokeStyle = `rgba(${ink},0.18)`; g8.lineWidth = 1; g8.strokeRect(fox + 0.5, foy + 0.5, fsize - 1, fsize - 1);
+      g8.font = '600 15px "IBM Plex Mono", ui-monospace, monospace'; g8.textBaseline = "middle";
+      [["A", 0, 0], ["C", 0, 1], ["G", 1, 1], ["T", 1, 0]].forEach(([s, u, v], i) => {
+        g8.fillStyle = col[i]; g8.textAlign = u ? "left" : "right";
+        g8.fillText(s, fox + u * fsize + (u ? 10 : -10), foy + (1 - v) * fsize);
+      });
+      // once done, mark where every "…CG" lands: the C quarter of the G corner
+      if (fi >= fs.length) {
+        g8.save(); g8.setLineDash([4, 4]); g8.strokeStyle = col[2]; g8.globalAlpha = 0.85; g8.lineWidth = 1.2;
+        g8.strokeRect(fox + fsize * 0.5, foy, fsize * 0.25, fsize * 0.25); g8.restore();
+        g8.fillStyle = col[2]; g8.textAlign = "center"; g8.font = '600 13px "IBM Plex Mono", ui-monospace, monospace';
+        g8.fillText(mode === "fractal" ? "…CG: rare in real DNA" : "…CG: filled in at random", fox + fsize * 0.625, foy - 14);
+      }
+      // the travelling point, with its last jump drawn while the plot is still young
+      if (fi < fs.length) {
+        if (fi < 2000) { g8.strokeStyle = `rgba(${ink},0.5)`; g8.beginPath(); g8.moveTo(fox + lx * fsize, foy + (1 - ly) * fsize); g8.lineTo(fox + fx * fsize, foy + (1 - fy) * fsize); g8.stroke(); }
+        g8.fillStyle = `rgb(${ink})`; g8.beginPath(); g8.arc(fox + fx * fsize, foy + (1 - fy) * fsize, 2.5, 0, 6.2832); g8.fill();
+      }
+      // hover: name the 4-letter ending that lands every point in this little square
+      let tail = "";
+      const u = (mx - fox) / fsize, v = 1 - (my - foy) / fsize;
+      if (hov && u >= 0 && u < 1 && v >= 0 && v < 1) {
+        const cx = Math.floor(u * 16), cyy = Math.floor(v * 16);
+        let s = "", uu = u, vv = v;
+        for (let lv = 0; lv < 4; lv++) { const r = uu >= 0.5, t = vv >= 0.5; s = (r ? (t ? "G" : "T") : (t ? "C" : "A")) + s; uu = (uu * 2) % 1; vv = (vv * 2) % 1; }
+        const exp = (fs.length - 3) * [...s].reduce((p, ch) => p * P[L.indexOf(ch)], 1);
+        g8.strokeStyle = `rgb(${ink})`; g8.lineWidth = 1.5; g8.strokeRect(fox + cx * fsize / 16, foy + (15 - cyy) * fsize / 16, fsize / 16, fsize / 16);
+        tail = ` · here: every stretch ending …${s} · ${cell[cyy * 16 + cx]} found, ≈${Math.round(exp)} if the letters were random`;
+      }
+      const cg = mode === "fractal" ? CG_REAL : CG_SHUF;
+      rd8.textContent = `${Math.min(fi, fs.length).toLocaleString()} of ${fs.length.toLocaleString()} bases · “CG” appears ${cg} times (≈${CG_EXP} expected by chance)${tail}`;
+    };
+
+    const setMode = m => {
+      mode = m; mbtn.forEach(b => b.dataset.m && b.setAttribute("aria-pressed", b.dataset.m === m ? "true" : "false"));
+      if (m === "helix") { eq8.textContent = "B-DNA · 10.5 base pairs per turn · 3.4 Å rise · A pairs with T, G with C"; hint8.textContent = "Move along the helix to open it · click to pause"; }
+      else { eq8.textContent = m === "fractal" ? "xₙ = (xₙ₋₁ + corner of baseₙ) / 2 · chaos game representation (Jeffrey, 1990)" : "same letters, shuffled into random order"; hint8.textContent = "Hover a square to see which letters landed there · click to replay"; startFractal(); }
+    };
+    mbtn.forEach(b => b.addEventListener("click", e => { e.stopPropagation(); setMode(b.dataset.m); }));
+    size(); new ResizeObserver(size).observe(lab); setMode("helix");
+    const frame = t => {
+      if (!vis) return;
+      const dt = lastT ? Math.min(50, t - lastT) : 16; lastT = t;
+      const dark = root.dataset.theme !== "light";
+      g8.clearRect(0, 0, DW, DH);
+      if (mode === "helix") drawHelix(dt, dark); else drawFractal(dark);
+      requestAnimationFrame(frame);
+    };
+    new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !vis) { vis = true; lastT = 0; requestAnimationFrame(frame); } if (!v) vis = false; }).observe(lab);
+    const at = e => { const r = cv8.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; };
+    cv8.addEventListener("pointermove", e => { at(e); hov = true; });
+    cv8.addEventListener("pointerleave", () => { hov = false; });
+    cv8.addEventListener("pointerdown", e => { at(e); if (e.pointerType !== "mouse") { hov = true; return; } if (mode === "helix") paused = !paused; else startFractal(); });
+    cv8.addEventListener("pointerup", e => { if (e.pointerType !== "mouse") hov = false; });
+  }
+
+  // ---------- Lab slot 09: Fibonacci sphere. Golden-angle points, nearest-neighbour links, signals on a random walk ----------
+  {
+    const lab = document.getElementById("lab-s"), cv9 = document.getElementById("fibs"), g9 = cv9.getContext("2d"), rd9 = document.getElementById("sread"), hint9 = document.getElementById("shint");
+    const nbtn = [...lab.querySelectorAll(".mag button[data-n]")], lbtn = lab.querySelector('.mag button[data-act="links"]');
+    const GOLD = 180 * (3 - Math.sqrt(5)); // 137.5077…°, the golden angle: 360° / φ²
+    let SW = 0, SH = 0, vis = false, N = 233, ang = GOLD, tang = GOLD, locked = false, hov = false, links = true, lastT = 0;
+    let spin = 0.6, P3 = [], edges = [], nbr = [], key = "", sig = [];
+    const size = () => { const r = lab.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1); SW = r.width; SH = r.height; cv9.width = Math.round(SW * dpr); cv9.height = Math.round(SH * dpr); g9.setTransform(dpr, 0, 0, dpr, 0, 0); };
+    size(); new ResizeObserver(size).observe(lab);
+    // Point n turns n × angle around the axis and sits at height 1 − (2n + 1)/N, so every point gets an equal share of the sphere's area.
+    const build = () => {
+      P3 = []; const a = ang * Math.PI / 180;
+      for (let i = 0; i < N; i++) { const y = 1 - (2 * i + 1) / N, r = Math.sqrt(1 - y * y), t = i * a; P3.push([r * Math.cos(t), y, r * Math.sin(t)]); }
+      // each point links to its 3 nearest neighbours (straight-line distance through the sphere)
+      const set = new Set(); nbr = P3.map(() => []);
+      for (let i = 0; i < N; i++) {
+        const best = [[9, -1], [9, -1], [9, -1]], [x, y, z] = P3[i];
+        for (let j = 0; j < N; j++) { if (j === i) continue; const d = (P3[j][0] - x) ** 2 + (P3[j][1] - y) ** 2 + (P3[j][2] - z) ** 2; if (d < best[2][0]) { best[2] = [d, j]; best.sort((p, q) => p[0] - q[0]); } }
+        for (const [, j] of best) { const k2 = i < j ? i * 4096 + j : j * 4096 + i; if (!set.has(k2)) { set.add(k2); nbr[i].push(j); nbr[j].push(i); } }
+      }
+      edges = [...set].map(k2 => [Math.floor(k2 / 4096), k2 % 4096]);
+      sig = sig.filter(s => s.a < N && s.b < N);
+      while (sig.length < 7) { const a0 = (Math.random() * N) | 0; sig.push({ a: a0, b: nbr[a0][0] ?? a0, t: Math.random() }); }
+    };
+    // Nearest simple fraction of a full turn, if there is one: that many spiral arms appear.
+    const arms = () => {
+      if (Math.abs(ang - GOLD) < 0.03) return "";
+      const f = ang / 360; let best = null;
+      for (let q = 2; q <= 34; q++) { const p = Math.round(f * q), e = Math.abs(f - p / q); if (e < 0.6 / (q * Math.sqrt(N)) && (!best || q < best[1])) best = [p, q]; }
+      return best ? ` · ≈ ${best[0]}/${best[1]} of a turn, so the points fall into ${best[1]} arms` : " · close to a simple fraction of a turn, so arms start to form";
+    };
+    const setN = n => { N = n; key = ""; nbtn.forEach(b => b.setAttribute("aria-pressed", +b.dataset.n === n ? "true" : "false")); };
+    nbtn.forEach(b => b.addEventListener("click", e => { e.stopPropagation(); setN(+b.dataset.n); }));
+    lbtn.addEventListener("click", e => { e.stopPropagation(); links = !links; lbtn.setAttribute("aria-pressed", links ? "true" : "false"); });
+    const frame = t => {
+      if (!vis) return;
+      const dt = lastT ? Math.min(50, t - lastT) : 16; lastT = t;
+      const dark = root.dataset.theme !== "light", ink = dark ? "232,222,255" : "40,26,110", lk = dark ? "180,154,255" : "74,42,168", sg = dark ? "#ffd38a" : "#8a4a00";
+      if (!locked && !hov) tang = GOLD;
+      ang += (tang - ang) * 0.08; if (Math.abs(ang - tang) < 1e-4) ang = tang;
+      const k = N + ":" + ang.toFixed(4); if (k !== key) { build(); key = k; }
+      if (!reduceMotion) spin += dt * 0.00018;
+      const cx = SW / 2, cy = SH * 0.5, R = Math.min(SW, SH) * 0.34, tilt = 0.35 + Math.sin(spin * 0.7) * 0.25;
+      const cs = Math.cos(spin), sn = Math.sin(spin), ct = Math.cos(tilt), st = Math.sin(tilt);
+      const S = P3.map(([x, y, z]) => { const x1 = x * cs + z * sn, z1 = -x * sn + z * cs, y1 = y * ct - z1 * st, z2 = y * st + z1 * ct, p = 1 / (1 - z2 * 0.28); return [cx + x1 * R * p, cy - y1 * R * p, z2, p]; });
+      g9.clearRect(0, 0, SW, SH);
+      g9.globalCompositeOperation = dark ? "lighter" : "source-over";
+      if (links) {
+        g9.lineWidth = 0.7;
+        for (const [i, j] of edges) { const a = S[i], b = S[j], d = ((a[2] + b[2]) / 2 + 1) / 2; g9.strokeStyle = `rgba(${lk},${0.08 + 0.32 * d})`; g9.beginPath(); g9.moveTo(a[0], a[1]); g9.lineTo(b[0], b[1]); g9.stroke(); }
+        // signals: each hops along a link, then picks a random neighbour and keeps going
+        for (const s of sig) {
+          if (!reduceMotion) s.t += dt / 380;
+          if (s.t >= 1) { s.t -= 1; const nx = nbr[s.b]; s.a = s.b; s.b = nx && nx.length ? nx[(Math.random() * nx.length) | 0] : s.b; }
+          const a = S[s.a], b = S[s.b]; if (!a || !b) continue;
+          const x = a[0] + (b[0] - a[0]) * s.t, y = a[1] + (b[1] - a[1]) * s.t, d = ((a[2] + b[2]) / 2 + 1) / 2;
+          g9.fillStyle = sg; g9.globalAlpha = 0.25 + 0.75 * d; g9.beginPath(); g9.arc(x, y, 2.2, 0, 6.2832); g9.fill();
+          if (dark) { g9.globalAlpha *= 0.25; g9.beginPath(); g9.arc(x, y, 7, 0, 6.2832); g9.fill(); }
+          g9.globalAlpha = 1;
+        }
+      }
+      const order = S.map((p, i) => i).sort((i, j) => S[i][2] - S[j][2]), dot = N > 400 ? 1.1 : N > 150 ? 1.5 : 2.2;
+      for (const i of order) {
+        const [x, y, z, p] = S[i], d = (z + 1) / 2;
+        g9.fillStyle = `rgba(${ink},${0.3 + 0.7 * d})`; g9.beginPath(); g9.arc(x, y, dot * p, 0, 6.2832); g9.fill();
+        if (dark && d > 0.55) { g9.fillStyle = `rgba(${lk},${0.12 * d})`; g9.beginPath(); g9.arc(x, y, dot * p * 3.2, 0, 6.2832); g9.fill(); }
+      }
+      g9.globalCompositeOperation = "source-over";
+      rd9.textContent = `turn ${ang.toFixed(2)}°${Math.abs(ang - GOLD) < 0.03 ? " = the golden angle, no two points ever line up" : arms()} · ${N} points · ${edges.length} links${locked ? " · locked" : ""}`;
+      requestAnimationFrame(frame);
+    };
+    new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !vis) { vis = true; lastT = 0; requestAnimationFrame(frame); } if (!v) vis = false; }).observe(lab);
+    // Pointer across the panel sweeps the turn from 132° to 143°; the golden angle sits at the centre.
+    const aim = e => { const r = cv9.getBoundingClientRect(), u = (e.clientX - r.left) / r.width; tang = GOLD + (u - 0.5) * 11; hov = true; };
+    cv9.addEventListener("pointermove", e => { if (!locked) aim(e); });
+    cv9.addEventListener("pointerleave", () => { hov = false; });
+    cv9.addEventListener("pointerdown", e => { if (e.pointerType !== "mouse") { aim(e); return; } locked = !locked; if (locked) aim(e); });
+    cv9.addEventListener("pointerup", e => { if (e.pointerType !== "mouse") hov = false; });
+  }
+
   // ---------- Celestial paintbrush: the cursor paints, and changes with each toy ----------
   {
     const bc = document.getElementById("brush");
@@ -1583,7 +1989,7 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
       b.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     sizeB(); window.addEventListener("resize", sizeB);
-    const ZONES = [["nebula", document.getElementById("heroband")], ["scope", document.getElementById("lab-2")], ["harm", document.getElementById("lab-h")], ["rd", document.getElementById("lab-rd")], ["julia", document.getElementById("lab-j")], ["four", document.getElementById("lab-f")], ["mold", document.getElementById("lab-m")], ["bolt", document.getElementById("lab-e")]];
+    const ZONES = [["nebula", document.getElementById("heroband")], ["scope", document.getElementById("lab-2")], ["harm", document.getElementById("lab-h")], ["rd", document.getElementById("lab-rd")], ["julia", document.getElementById("lab-j")], ["four", document.getElementById("lab-f")], ["mold", document.getElementById("lab-m")], ["bolt", document.getElementById("lab-e")], ["dna", document.getElementById("lab-dna")], ["fibs", document.getElementById("lab-s")]];
     const zoneAt = (x, y) => {
       for (const [z, el] of ZONES) { const r = el.getBoundingClientRect(); if (y >= r.top && y <= r.bottom && x >= r.left && x <= r.right) return z; }
       return "sky";
@@ -1605,6 +2011,10 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
       } else if (z === "bolt") {
         const pts = [[x, y]]; let qx = x, qy = y; for (let s2 = 0; s2 < 3; s2++) { qx += (R() - 0.5) * 9; qy += 3 + R() * 5; pts.push([qx, qy]); }
         parts.push({ k: "zap", x, y, vx: 0, vy: 0, r: 1, pts, c: dark ? "#d6dcff" : "#2a1d80", life: 260 + R() * 260, t: 0 });
+      } else if (z === "fibs") {
+        parts.push({ k: "orbit", cx: x, cy: y, x, y, vx: 0, vy: 0, r: 3 + R() * 10, a: R() * 6.28, w: 2.39996, c: pick(dark ? ["#d8caff", "#b49aff", "#ffd38a"] : ["#4a2aa8", "#281a6e", "#8a4a00"]), life: 700 + R() * 600, t: 0 });
+      } else if (z === "dna") {
+        parts.push({ k: "spot", x: x + (R() - 0.5) * 8, y: y + (R() - 0.5) * 8, vx: 0, vy: 0, r: 1.5 + R() * 3, c: pick(dark ? ["#ffd38a", "#b48cff", "#7ae0ff", "#ff7ac8"] : ["#8a4a00", "#4a2aa8", "#0b5e86", "#a0145a"]), life: 1000 + R() * 800, t: 0 });
       } else if (z === "mold") {
         parts.push({ k: "spore", x, y, vx: 0, vy: 0, r: 1.4 + R() * 1.2, a: R() * 6.28, c: pick(dark ? ["#f7a8e4", "#c9b6ff", "#cdf3ff"] : ["#3a2380", "#5b3cc4", "#14305f"]), life: 1400 + R() * 900, t: 0 });
       } else if (z === "four") {
@@ -1645,6 +2055,15 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
         b.beginPath(); b.arc(0, 0, 2.4, 0, 6.2832); b.fill();
         const hd = t * 0.0006;
         for (const da of [-0.5, 0, 0.5]) { b.beginPath(); b.moveTo(Math.cos(hd + da) * 5, Math.sin(hd + da) * 5); b.lineTo(Math.cos(hd + da) * 11, Math.sin(hd + da) * 11); b.stroke(); }
+      } else if (z === "fibs") {
+        // a sunflower head: dots placed by the golden angle
+        b.fillStyle = dark ? "#d8caff" : "#4a2aa8"; b.globalAlpha = 0.95;
+        for (let i = 1; i <= 21; i++) { const rr2 = 2.6 * Math.sqrt(i), a2 = i * 2.39996 + t * 0.0008; b.beginPath(); b.arc(rr2 * Math.cos(a2), rr2 * Math.sin(a2), i === 21 ? 1.6 : 1.05, 0, 6.2832); b.fill(); }
+      } else if (z === "dna") {
+        // a tiny turning double helix
+        b.lineWidth = 1.4; b.globalAlpha = 0.95;
+        for (let s2 = 0; s2 < 2; s2++) { b.strokeStyle = dark ? (s2 ? "#ff7ac8" : "#7ae0ff") : (s2 ? "#a0145a" : "#0b5e86"); b.beginPath(); for (let i = 0; i <= 24; i++) { const u = i / 24, yy = -12 + u * 24, xx = 6 * Math.sin(u * 6.2832 + t * 0.003 + s2 * 2.5); i ? b.lineTo(xx, yy) : b.moveTo(xx, yy); } b.stroke(); }
+        b.strokeStyle = ink; b.globalAlpha = 0.5; b.beginPath(); for (let i = 1; i < 6; i++) { const u = i / 6, yy = -12 + u * 24; b.moveTo(6 * Math.sin(u * 6.2832 + t * 0.003), yy); b.lineTo(6 * Math.sin(u * 6.2832 + t * 0.003 + 2.5), yy); } b.stroke();
       } else if (z === "four") {
         const a1 = t * 0.004, a2 = t * 0.011, x1 = 9 * Math.cos(a1), y1 = 9 * Math.sin(a1), x2 = x1 + 4 * Math.cos(a2), y2 = y1 + 4 * Math.sin(a2);
         b.strokeStyle = ink; b.lineWidth = 1.5; b.globalAlpha = 0.85;
@@ -1758,7 +2177,7 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
 
   // ---------- Scrollbar: takes the colours of the toy in view ----------
   {
-    const zs = [["nebula", "heroband"], ["scope", "lab-2"], ["harm", "lab-h"], ["rd", "lab-rd"], ["julia", "lab-j"], ["four", "lab-f"], ["mold", "lab-m"], ["bolt", "lab-e"]].map(([z, id]) => [z, document.getElementById(id)]);
+    const zs = [["nebula", "heroband"], ["scope", "lab-2"], ["harm", "lab-h"], ["rd", "lab-rd"], ["julia", "lab-j"], ["four", "lab-f"], ["mold", "lab-m"], ["bolt", "lab-e"], ["dna", "lab-dna"], ["fibs", "lab-s"]].map(([z, id]) => [z, document.getElementById(id)]);
     let raf = 0;
     const upd = () => {
       raf = 0; const mid = innerHeight / 2; let cur = "sky";
