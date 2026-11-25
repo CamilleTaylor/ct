@@ -49,7 +49,7 @@ nav a:hover,nav a:focus-visible{border-color:currentColor}
 .lab{position:relative;min-height:clamp(360px,72svh,760px)}
 .lab-sm{min-height:clamp(280px,48svh,520px)}
 .toylab{min-height:0;height:min(86svh,820px);margin-top:clamp(48px,9svh,110px)}
-@media (max-width:640px){.toylab .tag{display:none}}
+@media (max-width:640px){.lab .tag{display:none}.lab.lab .hint{max-width:100%}}
 .toy{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
 .eqn{position:absolute;left:0;right:0;top:16px;z-index:1;display:grid;gap:4px;font-size:12px;color:var(--soft);pointer-events:none;max-width:100%}
 .eqn span:last-child{color:var(--ink)}
@@ -59,6 +59,8 @@ nav a:hover,nav a:focus-visible{border-color:currentColor}
 #scope.drag{cursor:grabbing}
 .mag{position:absolute;left:50%;transform:translateX(-50%);bottom:56px;display:flex;gap:6px}
 .mag button{all:unset;box-sizing:border-box;cursor:pointer;min-width:52px;height:36px;display:grid;place-items:center;font:12px "IBM Plex Mono",ui-monospace,monospace;color:var(--soft);border:1px solid var(--line);border-radius:99px;background:color-mix(in srgb,var(--bg) 70%,transparent)}
+.mag button{padding:0 4px}
+@media (min-width:641px){.mag button{padding:0 12px}}
 .mag button[aria-pressed=true]{color:var(--ink);border-color:var(--ink)}
 .mag button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .lab .hint{position:absolute;left:0;bottom:18px;color:var(--soft);font-size:12px;max-width:60%;pointer-events:none;transition:opacity .4s}
@@ -99,6 +101,9 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
 :root[data-zone=bolt]{--sb1:#8c78ff;--sb2:#eef1ff}
 :root[data-zone=dna]{--sb1:#7ae0ff;--sb2:#ff7ac8}
 :root[data-zone=fibs]{--sb1:#b49aff;--sb2:#ffd38a}
+:root[data-zone=lsys]{--sb1:#5fe0a0;--sb2:#c9a6ff}
+:root[data-zone=flock]{--sb1:#7ab8ff;--sb2:#ff9bd6}
+:root[data-zone=flies]{--sb1:#d9ff7a;--sb2:#ffd38a}
 :root[data-theme=light]{--sb1:#4a2fd1;--sb2:#b0185a}
 :root[data-theme=light][data-zone=scope]{--sb1:#0f766e;--sb2:#2f7d3a}
 :root[data-theme=light][data-zone=julia]{--sb1:#4a2aa8;--sb2:#8a4a00}
@@ -107,12 +112,26 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
 :root[data-theme=light][data-zone=bolt]{--sb1:#4a2fd1;--sb2:#14141b}
 :root[data-theme=light][data-zone=dna]{--sb1:#0b5e86;--sb2:#a0145a}
 :root[data-theme=light][data-zone=fibs]{--sb1:#4a2aa8;--sb2:#8a4a00}
+:root[data-theme=light][data-zone=lsys]{--sb1:#1f6b45;--sb2:#5b3cc4}
+:root[data-theme=light][data-zone=flock]{--sb1:#1f4f9a;--sb2:#a0145a}
+:root[data-theme=light][data-zone=flies]{--sb1:#4d6a00;--sb2:#8a4a00}
 ::-webkit-scrollbar{width:12px;height:12px}
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--sb1),var(--sb2)) padding-box;border:4px solid transparent;border-radius:99px;min-height:48px}
 ::-webkit-scrollbar-thumb:hover{border-width:3px}
 ::-webkit-scrollbar-corner{background:var(--bg)}
 @supports not selector(::-webkit-scrollbar){html{scrollbar-width:thin;scrollbar-color:var(--sb2) transparent}}
+/* notes: a small ? on each toy opens a plain-words explanation */
+.qbtn{all:unset;box-sizing:border-box;position:absolute;top:10px;right:0;z-index:3;width:32px;height:32px;display:grid;place-items:center;border:1px solid var(--line);border-radius:99px;font:500 13px "IBM Plex Mono",ui-monospace,monospace;color:var(--soft);background:color-mix(in srgb,var(--bg) 70%,transparent);cursor:pointer;pointer-events:auto;transition:color .2s,border-color .2s}
+.qbtn::after{content:"";position:absolute;inset:-6px}
+.qbtn:hover,.qbtn[aria-expanded=true]{color:var(--ink);border-color:var(--ink)}
+.qbtn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.note{position:absolute;top:52px;right:0;z-index:3;margin:0;width:min(360px,100%);padding:16px 18px;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--bg) 84%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--ink);font:300 15px/1.6 Sora,system-ui,sans-serif;text-wrap:pretty;pointer-events:auto;animation:notein .25s ease-out}
+.note[hidden]{display:none}
+@keyframes notein{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.lab .eqn{padding-right:44px}
+.hero .qbtn{top:clamp(28px,6vw,88px);right:max(5vw,16px)}
+.hero .note{top:calc(clamp(28px,6vw,88px) + 42px);right:max(5vw,16px);width:min(360px,calc(100% - 2*max(5vw,16px)))}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
@@ -130,8 +149,8 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
 
 <main id="top">
   <div class="heroband" id="heroband">
-    <canvas id="field" aria-label="A strange attractor that reshapes as you move the pointer"></canvas>
-    <div class="wrap hero">
+    <canvas id="field" role="img" aria-label="A strange attractor that reshapes as you move the pointer. This shape comes from one tiny math rule used over and over. Each dot lands wherever the rule sends the dot before it, and after millions of jumps a picture appears out of nowhere. Change the four numbers even a little and you get a whole new creature."></canvas>
+    <div class="wrap hero" data-note="This shape comes from one tiny math rule used over and over. Each dot lands wherever the rule sends the dot before it, and after millions of jumps a picture appears out of nowhere. Change the four numbers even a little and you get a whole new creature.">
       <div>
         <h1 class="lede">cami's playground</h1>
       </div>
@@ -139,7 +158,7 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
         <div class="readout mono">
           <span class="eq">Clifford attractor · x′ = sin(a·y) + c·cos(a·x) · y′ = sin(b·x) + d·cos(b·y)</span>
           <span id="params">a <b>−1.70</b> b <b>1.60</b> c <b>1.00</b> d <b>0.70</b></span>
-          <span>Move to reshape · click to jump</span>
+          <span>Move over it to change its shape. Tap or click for a new one.</span>
         </div>
       </div>
     </div>
@@ -147,82 +166,109 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
 
   <div class="wrap">
     <!-- LAB SLOT 01: microscope. -->
-    <div class="lab" id="lab-2">
-      <canvas id="scope" aria-label="Microscope: drag to move the slide, click to start a cell dividing"></canvas>
+    <div class="lab" id="lab-2" data-note="This is a pretend drop of pond water under a microscope. The little blobs are living cells, and when one splits in two it is copying itself, the same way you grew from one single cell into a whole person. Press ∞ to keep shrinking down, past atoms, all the way to the smallest size science knows about.">
+      <canvas id="scope" role="img" aria-label="Microscope: drag to move the slide, click to start a cell dividing. This is a pretend drop of pond water under a microscope. The little blobs are living cells, and when one splits in two it is copying itself, the same way you grew from one single cell into a whole person. Press ∞ to keep shrinking down, past atoms, all the way to the smallest size science knows about."></canvas>
       <div class="mag mono" role="group" aria-label="Magnification"><button type="button" data-m="40">40×</button><button type="button" data-m="100" aria-pressed="true">100×</button><button type="button" data-m="400">400×</button><button type="button" data-m="inf" aria-label="Eternal zoom">∞</button></div>
-      <span class="hint mono" id="shint">Drag to move the slide · click to start a cell dividing</span>
+      <span class="hint mono" id="shint">Drag to slide the glass around. Tap or click to watch a cell split in two.</span>
       <span class="tag mono" aria-hidden="true">Lab · slot 01 · microscope</span>
     </div>
 
-    <!-- LAB SLOT 02: harmonograph. -->
-    <div class="lab toylab" id="lab-h">
-      <canvas class="toy" id="harm" aria-label="Harmonograph: move across it to retune the pendulums"></canvas>
-      <div class="eqn mono"><span>x(t) = e<sup>−δt</sup>[sin(f₁t + φ) + sin(f₂t)] · y(t) = e<sup>−δt</sup>[sin(f₁′t) + sin(f₂t + φ)]</span><span id="hread"></span></div>
-      <span class="hint mono" id="hhint">Move across it to retune the pendulums · click to freeze</span>
-      <span class="tag mono" aria-hidden="true">Lab · slot 02 · harmonograph</span>
-    </div>
-
-    <!-- LAB SLOT 03: reaction-diffusion. -->
-    <div class="lab toylab" id="lab-rd">
-      <canvas class="toy" id="rd" aria-label="Reaction-diffusion: drag to paint chemicals into the field"></canvas>
-      <div class="eqn mono"><span>∂u/∂t = Dᵤ∇²u − uv² + f(1 − u) · ∂v/∂t = Dᵥ∇²v + uv² − (f + k)v</span><span id="rdread"></span></div>
-      <div class="mag mono" role="group" aria-label="Pattern"><button type="button" data-p="coral" aria-pressed="true">Coral</button><button type="button" data-p="mitosis">Mitosis</button><button type="button" data-p="maze">Maze</button><button type="button" data-p="holes">Holes</button></div>
-      <span class="hint mono" id="rdhint">Drag to paint chemicals in</span>
-      <span class="tag mono" aria-hidden="true">Lab · slot 03 · reaction–diffusion</span>
-    </div>
-
-    <!-- LAB SLOT 04: Julia set explorer. -->
-    <div class="lab toylab" id="lab-j">
-      <canvas class="toy" id="julia" aria-label="Julia set explorer: the pointer position sets the complex number c"></canvas>
-      <div class="eqn mono"><span id="jeq">z ↦ z² + c · c near i</span><span id="jread"></span></div>
-      <div class="mag mono" role="group" aria-label="Species"><button type="button" data-s="dendrite" aria-pressed="true">Dendrite</button><button type="button" data-s="cell">Cell</button><button type="button" data-s="radiolarian">Radiolarian</button><button type="button" data-s="classic">Classic</button><button type="button" data-z="reset" hidden>Reset view</button></div>
-      <span class="hint mono" id="jhint">Move to choose c · click to zoom in</span>
-      <span class="tag mono" aria-hidden="true">Lab · slot 04 · Julia set</span>
-    </div>
-
-    <!-- LAB SLOT 05: Fourier epicycles. -->
-    <div class="lab toylab" id="lab-f">
-      <canvas class="toy" id="four" aria-label="Fourier epicycles: drag to draw a path and the circles will trace it"></canvas>
-      <div class="eqn mono"><span>f(t) = Σ cₙ e<sup>i n t</sup></span><span id="fread"></span></div>
-      <div class="mag mono" role="group" aria-label="Circles"><button type="button" data-n="5">5</button><button type="button" data-n="20">20</button><button type="button" data-n="80">80</button><button type="button" data-n="0" aria-pressed="true">All</button></div>
-      <span class="hint mono" id="fhint">Draw any shape · the circles will learn it</span>
-      <span class="tag mono" aria-hidden="true">Lab · slot 05 · Fourier epicycles</span>
-    </div>
-
-    <!-- LAB SLOT 06: slime mold (Physarum). -->
-    <div class="lab toylab" id="lab-m">
-      <canvas class="toy" id="mold" aria-label="Slime mold: hover to feed it, click to tear the network"></canvas>
-      <div class="eqn mono"><span>each cell: sense → turn toward the strongest trail → step → deposit · trail ← λ · blur(trail)</span><span id="mread"></span></div>
-      <div class="mag mono" role="group" aria-label="Pattern"><button type="button" data-p="neurons" aria-pressed="true">Neurons</button><button type="button" data-p="rivers">Rivers</button><button type="button" data-p="filaments">Filaments</button></div>
-      <span class="hint mono">Hover to feed it · click to tear the network</span>
-      <span class="tag mono" aria-hidden="true">Lab · slot 06 · slime mold</span>
-    </div>
-
-    <!-- LAB SLOT 07: lightning (dielectric breakdown). -->
-    <div class="lab toylab" id="lab-e">
-      <canvas class="toy" id="bolt" aria-label="Lightning: draw lightning rods and the bolt will find them"></canvas>
-      <div class="eqn mono"><span>∇²φ = 0 · a branch grows at cell i with P(i) = φᵢ<sup>η</sup> / Σ φⱼ<sup>η</sup></span><span id="eread"></span></div>
-      <div class="mag mono" role="group" aria-label="Discharge"><button type="button" data-p="bolt" aria-pressed="true">Lightning</button><button type="button" data-p="lich">Lichtenberg</button><button type="button" data-act="field" aria-pressed="true">Field</button><button type="button" data-act="clear">Clear</button></div>
-      <span class="hint mono">Draw lightning rods · the bolt will find them</span>
-      <span class="tag mono" aria-hidden="true">Lab · slot 07 · lightning</span>
-    </div>
-
-    <!-- LAB SLOT 08: DNA, from the human mitochondrial genome. -->
-    <div class="lab toylab" id="lab-dna">
-      <canvas class="toy" id="dna" aria-label="DNA: a double helix built from the human mitochondrial genome. Move along it to open it and watch it copy itself."></canvas>
-      <div class="eqn mono"><span id="deq">B-DNA · 10.5 base pairs per turn · 3.4 Å rise · A pairs with T, G with C</span><span id="dread"></span></div>
-      <div class="mag mono" role="group" aria-label="View"><button type="button" data-m="helix" aria-pressed="true">Helix</button><button type="button" data-m="fractal">Fractal</button><button type="button" data-m="random">Shuffled</button></div>
-      <span class="hint mono" id="dhint">Move along the helix to open it · click to pause</span>
-      <span class="tag mono" aria-hidden="true">Lab · slot 08 · DNA</span>
-    </div>
-
-    <!-- LAB SLOT 09: Fibonacci sphere. -->
-    <div class="lab toylab" id="lab-s">
-      <canvas class="toy" id="fibs" aria-label="Fibonacci sphere: move across it to change the turn between points and see why the golden angle spreads them evenly"></canvas>
+    <!-- LAB SLOT 02: Fibonacci sphere. -->
+    <div class="lab toylab" id="lab-s" data-note="Sunflowers have a secret. Each new seed turns about 137.5 degrees from the last one, a special turn called the golden angle, so no two seeds ever line up and none get squished. Here the same trick spreads dots evenly over a ball, and the little lights hop from dot to dot like messages zipping through a brain.">
+      <canvas class="toy" id="fibs" role="img" aria-label="Fibonacci sphere: move across it to change the turn between points and see why the golden angle spreads them evenly. Sunflowers have a secret. Each new seed turns about 137.5 degrees from the last one, a special turn called the golden angle, so no two seeds ever line up and none get squished. Here the same trick spreads dots evenly over a ball, and the little lights hop from dot to dot like messages zipping through a brain."></canvas>
       <div class="eqn mono"><span>point n: turn n × 137.508° · height 1 − (2n + 1)/N · link to the 3 nearest · signals take a random walk</span><span id="sread"></span></div>
       <div class="mag mono" role="group" aria-label="Points"><button type="button" data-n="89">89</button><button type="button" data-n="233" aria-pressed="true">233</button><button type="button" data-n="610">610</button><button type="button" data-act="links" aria-pressed="true">Links</button></div>
-      <span class="hint mono" id="shint">Move across to change the angle · click to lock it</span>
-      <span class="tag mono" aria-hidden="true">Lab · slot 09 · Fibonacci sphere</span>
+      <span class="hint mono" id="sphint">Slide side to side to change the turn between dots. Tap or click to keep it there.</span>
+      <span class="tag mono" aria-hidden="true">Lab · slot 02 · Fibonacci sphere</span>
+    </div>
+
+    <!-- LAB SLOT 03: harmonograph. -->
+    <div class="lab toylab" id="lab-h" data-note="Long ago, people built drawing machines out of swinging pendulums and a pen. Two swings mix together, and as they slowly run out of energy the lines curl inward. When the swings match tidy number pairs like 3 and 2, the drawing turns extra neat.">
+      <canvas class="toy" id="harm" role="img" aria-label="Harmonograph: move across it to retune the pendulums. Long ago, people built drawing machines out of swinging pendulums and a pen. Two swings mix together, and as they slowly run out of energy the lines curl inward. When the swings match tidy number pairs like 3 and 2, the drawing turns extra neat."></canvas>
+      <div class="eqn mono"><span>x(t) = e<sup>−δt</sup>[sin(f₁t + φ) + sin(f₂t)] · y(t) = e<sup>−δt</sup>[sin(f₁′t) + sin(f₂t + φ)]</span><span id="hread"></span></div>
+      <span class="hint mono" id="hhint">Move over it to change how the pendulums swing. Tap or click to freeze the drawing.</span>
+      <span class="tag mono" aria-hidden="true">Lab · slot 03 · harmonograph</span>
+    </div>
+
+    <!-- LAB SLOT 04: reaction-diffusion. -->
+    <div class="lab toylab" id="lab-rd" data-note="Two pretend chemicals are spreading out and gobbling each other up at the same time. Just those two simple things together can paint spots and stripes, like the ones on leopards, zebrafish and seashells. A famous code breaker named Alan Turing figured this out in 1952.">
+      <canvas class="toy" id="rd" role="img" aria-label="Reaction-diffusion: drag to paint chemicals into the field. Two pretend chemicals are spreading out and gobbling each other up at the same time. Just those two simple things together can paint spots and stripes, like the ones on leopards, zebrafish and seashells. A famous code breaker named Alan Turing figured this out in 1952."></canvas>
+      <div class="eqn mono"><span>∂u/∂t = Dᵤ∇²u − uv² + f(1 − u) · ∂v/∂t = Dᵥ∇²v + uv² − (f + k)v</span><span id="rdread"></span></div>
+      <div class="mag mono" role="group" aria-label="Pattern"><button type="button" data-p="coral" aria-pressed="true">Coral</button><button type="button" data-p="mitosis">Mitosis</button><button type="button" data-p="maze">Maze</button><button type="button" data-p="holes">Holes</button></div>
+      <span class="hint mono" id="rdhint">Drag to paint in more chemicals and watch the patterns grow.</span>
+      <span class="tag mono" aria-hidden="true">Lab · slot 04 · reaction–diffusion</span>
+    </div>
+
+    <!-- LAB SLOT 05: Julia set explorer. -->
+    <div class="lab toylab" id="lab-j" data-note="Take a point, multiply it by itself, add a number called c, and do it again and again. Some points stay close to home forever and some fly off to infinity, and this shape is the border between them. You can zoom in forever and you will never run out of new curls.">
+      <canvas class="toy" id="julia" role="img" aria-label="Julia set explorer: the pointer position sets the complex number c. Take a point, multiply it by itself, add a number called c, and do it again and again. Some points stay close to home forever and some fly off to infinity, and this shape is the border between them. You can zoom in forever and you will never run out of new curls."></canvas>
+      <div class="eqn mono"><span id="jeq">z ↦ z² + c · c near i</span><span id="jread"></span></div>
+      <div class="mag mono" role="group" aria-label="Species"><button type="button" data-s="dendrite" aria-pressed="true">Dendrite</button><button type="button" data-s="cell">Cell</button><button type="button" data-s="radiolarian">Radiolarian</button><button type="button" data-s="classic">Classic</button><button type="button" data-z="reset" hidden>Reset view</button></div>
+      <span class="hint mono" id="jhint">Move over it to change the shape. Click to zoom in.</span>
+      <span class="tag mono" aria-hidden="true">Lab · slot 05 · Julia set</span>
+    </div>
+
+    <!-- LAB SLOT 06: Fourier epicycles. -->
+    <div class="lab toylab" id="lab-f" data-note="Any drawing, even your own name, can be made from circles spinning on top of circles. Each circle turns at its own speed, and the pen at the very end traces your shape. The more circles you use, the closer the copy gets.">
+      <canvas class="toy" id="four" role="img" aria-label="Fourier epicycles: drag to draw a path and the circles will trace it. Any drawing, even your own name, can be made from circles spinning on top of circles. Each circle turns at its own speed, and the pen at the very end traces your shape. The more circles you use, the closer the copy gets."></canvas>
+      <div class="eqn mono"><span>f(t) = Σ cₙ e<sup>i n t</sup></span><span id="fread"></span></div>
+      <div class="mag mono" role="group" aria-label="Circles"><button type="button" data-n="5">5</button><button type="button" data-n="20">20</button><button type="button" data-n="80">80</button><button type="button" data-n="0" aria-pressed="true">All</button></div>
+      <span class="hint mono" id="fhint">Draw any shape and the spinning circles will learn to trace it.</span>
+      <span class="tag mono" aria-hidden="true">Lab · slot 06 · Fourier epicycles</span>
+    </div>
+
+    <!-- LAB SLOT 07: slime mold (Physarum). -->
+    <div class="lab toylab" id="lab-m" data-note="Slime mold is a real yellow goo with no brain at all, yet it can find the shortest way through a maze. Each tiny piece just follows the trail the others left behind, and together they build networks that look like roads, rivers or nerves. Scientists once watched one grow a map of the train lines around Tokyo.">
+      <canvas class="toy" id="mold" role="img" aria-label="Slime mold: hover to feed it, click to tear the network. Slime mold is a real yellow goo with no brain at all, yet it can find the shortest way through a maze. Each tiny piece just follows the trail the others left behind, and together they build networks that look like roads, rivers or nerves. Scientists once watched one grow a map of the train lines around Tokyo."></canvas>
+      <div class="eqn mono"><span>each cell: sense → turn toward the strongest trail → step → deposit · trail ← λ · blur(trail)</span><span id="mread"></span></div>
+      <div class="mag mono" role="group" aria-label="Pattern"><button type="button" data-p="neurons" aria-pressed="true">Neurons</button><button type="button" data-p="rivers">Rivers</button><button type="button" data-p="filaments">Filaments</button></div>
+      <span class="hint mono">Move over it to feed the slime. Tap or click to tear its web apart.</span>
+      <span class="tag mono" aria-hidden="true">Lab · slot 07 · slime mold</span>
+    </div>
+
+    <!-- LAB SLOT 08: lightning (dielectric breakdown). -->
+    <div class="lab toylab" id="lab-e" data-note="Lightning doesn&#x27;t know where it is going. At every step it picks a direction partly by chance, but it is more likely to head where the electric pull is strongest. That is why it forks and zigzags, and why it jumps to the lightning rods you draw.">
+      <canvas class="toy" id="bolt" role="img" aria-label="Lightning: draw lightning rods and the bolt will find them. Lightning doesn&#x27;t know where it is going. At every step it picks a direction partly by chance, but it is more likely to head where the electric pull is strongest. That is why it forks and zigzags, and why it jumps to the lightning rods you draw."></canvas>
+      <div class="eqn mono"><span>∇²φ = 0 · a branch grows at cell i with P(i) = φᵢ<sup>η</sup> / Σ φⱼ<sup>η</sup></span><span id="eread"></span></div>
+      <div class="mag mono" role="group" aria-label="Discharge"><button type="button" data-p="bolt" aria-pressed="true">Lightning</button><button type="button" data-p="lich">Lichtenberg</button><button type="button" data-act="field" aria-pressed="true">Field</button><button type="button" data-act="clear">Clear</button></div>
+      <span class="hint mono">Draw lines to make lightning rods, and the lightning will find them.</span>
+      <span class="tag mono" aria-hidden="true">Lab · slot 08 · lightning</span>
+    </div>
+
+    <!-- LAB SLOT 09: DNA, from the human mitochondrial genome. -->
+    <div class="lab toylab" id="lab-dna" data-note="DNA is the instruction book inside almost every cell in your body, written with just four letters: A, T, G and C. This one uses real letters from human DNA, from the tiny power plants in your cells called mitochondria. When the ladder unzips, each side grabs new partners, and that is how a cell copies its book before it splits.">
+      <canvas class="toy" id="dna" role="img" aria-label="DNA: a double helix built from the human mitochondrial genome. Move along it to open it and watch it copy itself. DNA is the instruction book inside almost every cell in your body, written with just four letters: A, T, G and C. This one uses real letters from human DNA, from the tiny power plants in your cells called mitochondria. When the ladder unzips, each side grabs new partners, and that is how a cell copies its book before it splits."></canvas>
+      <div class="eqn mono"><span id="deq">B-DNA · 10.5 base pairs per turn · 3.4 Å rise · A pairs with T, G with C</span><span id="dread"></span></div>
+      <div class="mag mono" role="group" aria-label="View"><button type="button" data-m="helix" aria-pressed="true">Helix</button><button type="button" data-m="fractal">Fractal</button><button type="button" data-m="random">Shuffled</button></div>
+      <span class="hint mono" id="dhint">Move along the twisty ladder to unzip it. Tap or click to pause.</span>
+      <span class="tag mono" aria-hidden="true">Lab · slot 09 · DNA</span>
+    </div>
+
+    <!-- LAB SLOT 10: L-system garden. -->
+    <div class="lab toylab" id="lab-l" data-note="This plant grows from a tiny rule, like “replace every X with a longer string of letters.” Do that a few times and the instructions get huge. Then a pretend turtle reads them: F means step forward, plus and minus mean turn, and brackets mean grow a branch and come back. Real ferns and weeds grow with patterns a lot like this.">
+      <canvas class="toy" id="lsys" role="img" aria-label="L-system garden: plants grown from rewriting rules. Move across to change the branching angle, click to grow a new one. This plant grows from a tiny rule, like “replace every X with a longer string of letters.” Do that a few times and the instructions get huge. Then a pretend turtle reads them: F means step forward, plus and minus mean turn, and brackets mean grow a branch and come back. Real ferns and weeds grow with patterns a lot like this."></canvas>
+      <div class="eqn mono"><span id="leq">X → F+[[X]−X]−F[−FX]+X · F → FF</span><span id="lread"></span></div>
+      <div class="mag mono" role="group" aria-label="Plant"><button type="button" data-p="fern" aria-pressed="true">Fern</button><button type="button" data-p="weed">Weed</button><button type="button" data-p="bush">Bush</button><button type="button" data-p="herb">Herb</button></div>
+      <span class="hint mono">Slide side to side to bend the branches. Tap or click to grow a new plant.</span>
+      <span class="tag mono" aria-hidden="true">Lab · slot 10 · L-system garden</span>
+    </div>
+
+    <!-- LAB SLOT 11: flock (boids). -->
+    <div class="lab toylab" id="lab-b" data-note="Every bird here follows just three rules: don&#x27;t bump into your neighbors, fly the way they are flying, and stay close to the group. Nobody is the leader, yet the whole flock swoops and turns together like real starlings. Scientists call this emergence, when small simple rules add up to something that looks smart.">
+      <canvas class="toy" id="flock" role="img" aria-label="Flock: hundreds of birds following three local rules. Your pointer is a hawk, click to drop bait. Every bird here follows just three rules: don&#x27;t bump into your neighbors, fly the way they are flying, and stay close to the group. Nobody is the leader, yet the whole flock swoops and turns together like real starlings. Scientists call this emergence, when small simple rules add up to something that looks smart."></canvas>
+      <div class="eqn mono"><span>vᵢ += a(v̄ − vᵢ) + c(x̄ − xᵢ) + s Σ (xᵢ − xⱼ)/|xᵢ − xⱼ| · only neighbours within sight count</span><span id="bread"></span></div>
+      <div class="mag mono" role="group" aria-label="Species"><button type="button" data-p="starlings" aria-pressed="true">Starlings</button><button type="button" data-p="fish">Fish</button><button type="button" data-p="gnats">Gnats</button></div>
+      <span class="hint mono">Point at the birds to scare them like a hawk. Tap or click to drop food.</span>
+      <span class="tag mono" aria-hidden="true">Lab · slot 11 · flock</span>
+    </div>
+
+    <!-- LAB SLOT 12: fireflies (Kuramoto). -->
+    <div class="lab toylab" id="lab-k" data-note="Each firefly has its own blinking clock that runs a little fast or a little slow. When it sees a neighbor flash, it nudges its clock a tiny bit to match. Do that enough times and the whole field blinks at once, just like the real fireflies that flash together in the Great Smoky Mountains every early summer.">
+      <canvas class="toy" id="flies" role="img" aria-label="Fireflies: each one nudges its own flash toward the others. Move across to change how strongly they listen, click to scatter them. Each firefly has its own blinking clock that runs a little fast or a little slow. When it sees a neighbor flash, it nudges its clock a tiny bit to match. Do that enough times and the whole field blinks at once, just like the real fireflies that flash together in the Great Smoky Mountains every early summer."></canvas>
+      <div class="eqn mono"><span id="keq">dθᵢ/dt = ωᵢ + (K/nᵢ) Σ sin(θⱼ − θᵢ) over the fireflies it can see · it flashes each time θ passes 2π</span><span id="kread"></span></div>
+      <div class="mag mono" role="group" aria-label="Listening"><button type="button" data-p="local" aria-pressed="true">Neighbors</button><button type="button" data-p="global">Everyone</button><button type="button" data-act="scatter">Scatter</button></div>
+      <span class="hint mono">Slide side to side to change how much they copy each other. Tap or click to scatter them.</span>
+      <span class="tag mono" aria-hidden="true">Lab · slot 12 · fireflies</span>
     </div>
   </div>
 </main>
@@ -931,7 +977,7 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
           const [wx2, wy2] = toWorld(x, y);
           cells.push({ x: wx2, y: wy2, a: Math.random() * 3.14, t0: performance.now() });
           if (cells.length > 24) cells.shift();
-          hint.textContent = mag < 400 ? "Cell dividing · switch to 400× for a closer look" : "Cell dividing · watch the chromosomes line up and pull apart";
+          hint.textContent = mag < 400 ? "A cell is splitting! Press 400× for a closer look." : "Watch the chromosomes line up in the middle, then pull apart.";
         }
       }
       drag = null;
@@ -939,7 +985,7 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
     });
     for (const b of lab.querySelectorAll(".mag button")) b.addEventListener("click", () => {
       eternal = b.dataset.m === "inf";
-      hint.textContent = eternal ? "Eternal zoom · scroll to steer · hold to fall faster" : "Drag to move the slide · click to start a cell dividing";
+      hint.textContent = eternal ? "You are falling forever. Scroll to zoom in or back out, and press and hold to fall faster." : "Drag to slide the glass around. Tap or click to watch a cell split in two.";
       sc.style.cursor = eternal ? "zoom-in" : "";
       if (eternal) { ez = 1; ei = 0; eLast = performance.now(); }
       else { mag = +b.dataset.m; tpp = (2 * LR) / FOV[mag]; }
@@ -948,7 +994,7 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
     });
   }
 
-  // ---------- Lab slot 02: harmonograph ----------
+  // ---------- Lab slot 03: harmonograph ----------
   {
     const lab = document.getElementById("lab-h"), cv2 = document.getElementById("harm"), h = cv2.getContext("2d"), rd2 = document.getElementById("hread");
     let HW = 0, HH = 0, vis = false, frozen = false, tx = 0.5, ty = 0.3, mx = 0.5, my = 0.3;
@@ -990,7 +1036,7 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
     cv2.addEventListener("pointerdown", () => { frozen = !frozen; });
   }
 
-  // ---------- Lab slot 03: Gray-Scott reaction-diffusion ----------
+  // ---------- Lab slot 04: Gray-Scott reaction-diffusion ----------
   {
     const lab = document.getElementById("lab-rd"), cv3 = document.getElementById("rd"), g5 = cv3.getContext("2d"), rd3 = document.getElementById("rdread");
     const PRE = { coral: [0.0545, 0.062], mitosis: [0.0367, 0.0649], maze: [0.029, 0.057], holes: [0.039, 0.058] };
@@ -1057,13 +1103,13 @@ footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--soft);fo
     });
   }
 
-  // ---------- Lab slot 04: Julia set explorer ----------
+  // ---------- Lab slot 05: Julia set explorer ----------
   // Renders on the GPU at full screen resolution; falls back to the old CPU version without WebGL.
   {
     const lab = document.getElementById("lab-j"), cv4 = document.getElementById("julia"), rd4 = document.getElementById("jread"), eq4 = document.getElementById("jeq"), hint4 = document.getElementById("jhint"), sbtn = [...lab.querySelectorAll(".mag button[data-s]")], zbtn = lab.querySelector('.mag button[data-z="reset"]');
     const gl = cv4.getContext("webgl", { premultipliedAlpha: true, alpha: true, antialias: false });
     if (!gl) {
-      lab.querySelector(".mag").hidden = true; eq4.textContent = "z ↦ z² + c"; hint4.textContent = "Move to choose c · click to lock it";
+      lab.querySelector(".mag").hidden = true; eq4.textContent = "z ↦ z² + c"; hint4.textContent = "Move over it to change the shape. Click to keep it.";
       const j = cv4.getContext("2d");
       let JW = 0, JH = 0, GX = 0, GY = 0, glow = document.createElement("canvas"), gc = glow.getContext("2d"), off = document.createElement("canvas"), oc = off.getContext("2d"), img, vis = false, locked = false;
       let th = 2.1, rr = 0.985, tth = th, trr = rr, lastC = "";
@@ -1231,8 +1277,8 @@ void main(){
       const setHint = () => {
         const z = tzm > 1.01;
         zbtn.hidden = !z;
-        hint4.textContent = z ? (tzm >= ZMAX * 0.99 ? "That’s as deep as the GPU’s numbers go · Reset view" : (touchy ? "Tap to zoom deeper · Reset view to back out" : "Click to zoom deeper · right-click to back out"))
-          : (touchy ? "Drag to choose c · tap to zoom in" : "Move to choose c · click to zoom in");
+        hint4.textContent = z ? (tzm >= ZMAX * 0.99 ? "This is as far as your computer can zoom. Press Reset view to start over." : (touchy ? "Tap to zoom in deeper. Press Reset view to zoom back out." : "Click to zoom in deeper. Right-click to zoom back out."))
+          : (touchy ? "Drag to change the shape. Tap to zoom in." : "Move over it to change the shape. Click to zoom in.");
       };
       const zoomAt = e => {
         if (tzm >= ZMAX * 0.99) return;
@@ -1256,7 +1302,7 @@ void main(){
     }
   }
 
-  // ---------- Lab slot 05: Fourier epicycles ----------
+  // ---------- Lab slot 06: Fourier epicycles ----------
   {
     const lab = document.getElementById("lab-f"), cv5 = document.getElementById("four"), f = cv5.getContext("2d"), rd5 = document.getElementById("fread");
     let FW = 0, FH = 0, vis = false, coef = [], N = 0, idx = 0, trail = [], nShow = 0, drawing = null, src = "butterfly";
@@ -1334,7 +1380,7 @@ void main(){
     });
   }
 
-  // ---------- Lab slot 06: Physarum slime mold ----------
+  // ---------- Lab slot 07: Physarum slime mold ----------
   {
     const lab = document.getElementById("lab-m"), cv6 = document.getElementById("mold"), rd6 = document.getElementById("mread");
     const PRE = {
@@ -1507,7 +1553,7 @@ void main(){
     });
   }
 
-  // ---------- Lab slot 07: lightning, the dielectric breakdown model ----------
+  // ---------- Lab slot 08: lightning, the dielectric breakdown model ----------
   {
     const lab = document.getElementById("lab-e"), cv7 = document.getElementById("bolt"), g = cv7.getContext("2d"), rd7 = document.getElementById("eread");
     const PRE = { bolt: { eta: 2, k: 14, step: true, name: "lightning" }, lich: { eta: 1, k: 9, step: false, name: "Lichtenberg figure" } };
@@ -1735,7 +1781,7 @@ void main(){
     });
   }
 
-  // ---------- Lab slot 08: DNA. A B-DNA helix built from the human mitochondrial genome, and its chaos game fractal ----------
+  // ---------- Lab slot 09: DNA. A B-DNA helix built from the human mitochondrial genome, and its chaos game fractal ----------
   {
     const lab = document.getElementById("lab-dna"), cv8 = document.getElementById("dna"), g8 = cv8.getContext("2d"), rd8 = document.getElementById("dread"), eq8 = document.getElementById("deq"), hint8 = document.getElementById("dhint");
     const mbtn = [...lab.querySelectorAll(".mag button")];
@@ -1875,8 +1921,8 @@ void main(){
 
     const setMode = m => {
       mode = m; mbtn.forEach(b => b.dataset.m && b.setAttribute("aria-pressed", b.dataset.m === m ? "true" : "false"));
-      if (m === "helix") { eq8.textContent = "B-DNA · 10.5 base pairs per turn · 3.4 Å rise · A pairs with T, G with C"; hint8.textContent = "Move along the helix to open it · click to pause"; }
-      else { eq8.textContent = m === "fractal" ? "xₙ = (xₙ₋₁ + corner of baseₙ) / 2 · chaos game representation (Jeffrey, 1990)" : "same letters, shuffled into random order"; hint8.textContent = "Hover a square to see which letters landed there · click to replay"; startFractal(); }
+      if (m === "helix") { eq8.textContent = "B-DNA · 10.5 base pairs per turn · 3.4 Å rise · A pairs with T, G with C"; hint8.textContent = "Move along the twisty ladder to unzip it. Tap or click to pause."; }
+      else { eq8.textContent = m === "fractal" ? "xₙ = (xₙ₋₁ + corner of baseₙ) / 2 · chaos game representation (Jeffrey, 1990)" : "same letters, shuffled into random order"; hint8.textContent = "Point at a square to see which DNA letters landed there. Tap or click to draw it again."; startFractal(); }
     };
     mbtn.forEach(b => b.addEventListener("click", e => { e.stopPropagation(); setMode(b.dataset.m); }));
     size(); new ResizeObserver(size).observe(lab); setMode("helix");
@@ -1892,13 +1938,15 @@ void main(){
     const at = e => { const r = cv8.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; };
     cv8.addEventListener("pointermove", e => { at(e); hov = true; });
     cv8.addEventListener("pointerleave", () => { hov = false; });
-    cv8.addEventListener("pointerdown", e => { at(e); if (e.pointerType !== "mouse") { hov = true; return; } if (mode === "helix") paused = !paused; else startFractal(); });
-    cv8.addEventListener("pointerup", e => { if (e.pointerType !== "mouse") hov = false; });
+    let tap8 = null; const isTap = (d, e) => d && performance.now() - d[2] < 320 && Math.hypot(e.clientX - d[0], e.clientY - d[1]) < 12;
+    const act8 = () => { if (mode === "helix") paused = !paused; else startFractal(); };
+    cv8.addEventListener("pointerdown", e => { at(e); if (e.pointerType !== "mouse") { hov = true; tap8 = [e.clientX, e.clientY, performance.now()]; return; } act8(); });
+    cv8.addEventListener("pointerup", e => { if (e.pointerType !== "mouse") { hov = false; if (isTap(tap8, e)) act8(); tap8 = null; } });
   }
 
-  // ---------- Lab slot 09: Fibonacci sphere. Golden-angle points, nearest-neighbour links, signals on a random walk ----------
+  // ---------- Lab slot 02: Fibonacci sphere. Golden-angle points, nearest-neighbour links, signals on a random walk ----------
   {
-    const lab = document.getElementById("lab-s"), cv9 = document.getElementById("fibs"), g9 = cv9.getContext("2d"), rd9 = document.getElementById("sread"), hint9 = document.getElementById("shint");
+    const lab = document.getElementById("lab-s"), cv9 = document.getElementById("fibs"), g9 = cv9.getContext("2d"), rd9 = document.getElementById("sread"), hint9 = document.getElementById("sphint");
     const nbtn = [...lab.querySelectorAll(".mag button[data-n]")], lbtn = lab.querySelector('.mag button[data-act="links"]');
     const GOLD = 180 * (3 - Math.sqrt(5)); // 137.5077…°, the golden angle: 360° / φ²
     let SW = 0, SH = 0, vis = false, N = 233, ang = GOLD, tang = GOLD, locked = false, hov = false, links = true, lastT = 0;
@@ -1972,8 +2020,293 @@ void main(){
     const aim = e => { const r = cv9.getBoundingClientRect(), u = (e.clientX - r.left) / r.width; tang = GOLD + (u - 0.5) * 11; hov = true; };
     cv9.addEventListener("pointermove", e => { if (!locked) aim(e); });
     cv9.addEventListener("pointerleave", () => { hov = false; });
-    cv9.addEventListener("pointerdown", e => { if (e.pointerType !== "mouse") { aim(e); return; } locked = !locked; if (locked) aim(e); });
-    cv9.addEventListener("pointerup", e => { if (e.pointerType !== "mouse") hov = false; });
+    let tap9 = null; const isTap = (d, e) => d && performance.now() - d[2] < 320 && Math.hypot(e.clientX - d[0], e.clientY - d[1]) < 12;
+    cv9.addEventListener("pointerdown", e => { if (e.pointerType !== "mouse") { if (!locked) aim(e); tap9 = [e.clientX, e.clientY, performance.now()]; return; } locked = !locked; if (locked) aim(e); });
+    cv9.addEventListener("pointerup", e => { if (e.pointerType !== "mouse") { if (isTap(tap9, e)) { locked = !locked; if (locked) aim(e); } if (!locked) hov = false; tap9 = null; } });
+  }
+
+  // ---------- Lab slot 10: L-system garden. Lindenmayer's rewriting rules, drawn by a turtle ----------
+  {
+    const lab = document.getElementById("lab-l"), cvL = document.getElementById("lsys"), gL = cvL.getContext("2d"), rdL = document.getElementById("lread"), eqL = document.getElementById("leq");
+    const pbtnL = [...lab.querySelectorAll(".mag button[data-p]")];
+    // Rules from Prusinkiewicz & Lindenmayer, The Algorithmic Beauty of Plants (1990). Herb is stochastic: each F picks one of three rewrites.
+    const PLANTS = {
+      fern: { ax: "X", rules: { X: ["F+[[X]-X]-F[-FX]+X"], F: ["FF"] }, ang: 25, n: 6, lean: 12 },
+      weed: { ax: "X", rules: { X: ["F[+X]F[-X]+X"], F: ["FF"] }, ang: 20, n: 7, lean: 0 },
+      bush: { ax: "X", rules: { X: ["F[+X][-X]FX"], F: ["FF"] }, ang: 25.7, n: 7, lean: 0 },
+      herb: { ax: "F", rules: { F: ["F[+F]F[-F]F", "F[+F]F", "F[-F]F"] }, ang: 25.7, n: 6, lean: 0 }
+    };
+    const rng = s => () => { s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+    let LW = 0, LH = 0, vis = false, lastT = 0, kind = "fern", seed = 7, str = "", jit = new Float32Array(0), grow = 0, ang = 25, tang = 25, hov = false;
+    let segs = new Float32Array(0), nseg = 0, maxd = 1, maxDepth = 1, sc = 0, ox = 0, oy = 0;
+    const size = () => { const r = lab.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1); LW = r.width; LH = r.height; cvL.width = Math.round(LW * dpr); cvL.height = Math.round(LH * dpr); gL.setTransform(dpr, 0, 0, dpr, 0, 0); sc = 0; };
+    size(); new ResizeObserver(size).observe(lab);
+    const pretty = s => s.replace(/-/g, "−");
+    const expand = () => {
+      const P = PLANTS[kind], R = rng(seed); let s = P.ax;
+      for (let i = 0; i < P.n; i++) { let o = ""; for (const ch of s) { const r = P.rules[ch]; o += r ? r[r.length > 1 ? Math.min(r.length - 1, (R() * r.length) | 0) : 0] : ch; } s = o; }
+      str = s; grow = reduceMotion ? 1 : 0; sc = 0;
+      jit = new Float32Array(str.length); for (let i = 0; i < str.length; i++) jit[i] = R() - 0.5;
+      let nF = 0; for (let i = 0; i < str.length; i++) if (str.charCodeAt(i) === 70) nF++;
+      if (segs.length < nF * 6) segs = new Float32Array(nF * 6);
+      eqL.textContent = Object.entries(P.rules).map(([k, v]) => `${k} → ${v.map(pretty).join(" | ")}`).join(" · ") + ` · start from ${P.ax}`;
+    };
+    // The turtle reads the string: F steps forward, + and − turn, [ remembers where it is, ] goes back there.
+    const walk = (a, t) => {
+      const P = PLANTS[kind], rad = Math.PI / 180, wind = reduceMotion ? 0 : Math.sin(t * 0.00085) * 0.6 + Math.sin(t * 0.0021) * 0.25;
+      let x = 0, y = 0, h = (-90 + P.lean) * rad, depth = 0, dist = 0; const st = [];
+      let minx = 0, maxx = 0, miny = 0, maxy = 0; nseg = 0; maxd = 1; maxDepth = 1;
+      for (let i = 0; i < str.length; i++) {
+        const c = str.charCodeAt(i);
+        if (c === 70) {
+          h += wind * 0.0016 * (1 + depth * 0.5);
+          const nx = x + Math.cos(h), ny = y + Math.sin(h), o = nseg * 6;
+          segs[o] = x; segs[o + 1] = y; segs[o + 2] = nx; segs[o + 3] = ny; segs[o + 4] = depth; segs[o + 5] = dist;
+          nseg++; x = nx; y = ny; dist++;
+          if (x < minx) minx = x; if (x > maxx) maxx = x; if (y < miny) miny = y; if (y > maxy) maxy = y;
+          if (dist > maxd) maxd = dist;
+        } else if (c === 43 || c === 45) {
+          h += (c === 43 ? 1 : -1) * (a + jit[i] * 5) * rad;
+        } else if (c === 91) { st.push(x, y, h, depth, dist); depth++; if (depth > maxDepth) maxDepth = depth; }
+        else if (c === 93) { dist = st.pop(); depth = st.pop(); h = st.pop(); y = st.pop(); x = st.pop(); }
+      }
+      // fit the whole plant into the panel, root at the bottom; ease so the plant does not jump while it sways
+      const top = 84, bot = LH - 112, bw = Math.max(1, maxx - minx), bh = Math.max(1, maxy - miny);
+      const tsc = Math.min((LW * 0.86) / bw, (bot - top) / bh), tox = LW / 2 - (minx + maxx) / 2 * tsc, toy = bot - maxy * tsc;
+      if (!sc) { sc = tsc; ox = tox; oy = toy; } else { sc += (tsc - sc) * 0.06; ox += (tox - ox) * 0.06; oy += (toy - oy) * 0.06; }
+    };
+    const setKind = k => { kind = k; tang = ang = PLANTS[k].ang; pbtnL.forEach(b => b.setAttribute("aria-pressed", b.dataset.p === k ? "true" : "false")); expand(); };
+    pbtnL.forEach(b => b.addEventListener("click", e => { e.stopPropagation(); seed++; setKind(b.dataset.p); }));
+    setKind("fern");
+    const frame = t => {
+      if (!vis) return;
+      const dt = lastT ? Math.min(50, t - lastT) : 16; lastT = t;
+      const dark = root.dataset.theme !== "light", P = PLANTS[kind];
+      if (!hov) tang = P.ang;
+      ang += (tang - ang) * 0.08;
+      if (grow < 1) grow = Math.min(1, grow + dt / 4600);
+      walk(ang, t);
+      gL.clearRect(0, 0, LW, LH);
+      gL.globalCompositeOperation = dark ? "lighter" : "source-over"; gL.lineCap = "round";
+      // it grows outward from the root: a segment appears once growth reaches its distance along the stem
+      const g = 1 - Math.pow(1 - grow, 2.2), lim = g * maxd, paths = [];
+      for (let d = 0; d <= maxDepth; d++) paths.push(new Path2D());
+      const tips = [];
+      for (let k = 0; k < nseg; k++) {
+        const o = k * 6, d0 = segs[o + 5]; if (d0 >= lim) continue;
+        const f = Math.min(1, lim - d0), x1 = ox + segs[o] * sc, y1 = oy + segs[o + 1] * sc;
+        const x2 = x1 + (segs[o + 2] - segs[o]) * sc * f, y2 = y1 + (segs[o + 3] - segs[o + 1]) * sc * f;
+        const p = paths[segs[o + 4]]; p.moveTo(x1, y1); p.lineTo(x2, y2);
+        if (f < 1 && tips.length < 400) tips.push(x2, y2);
+      }
+      for (let d = 0; d <= maxDepth; d++) {
+        const u = d / Math.max(1, maxDepth);
+        gL.strokeStyle = dark ? `hsla(${152 + u * 128},72%,${52 + u * 18}%,${0.85 - u * 0.3})` : `hsla(${150 + u * 120},55%,${20 + u * 14}%,${0.9 - u * 0.25})`;
+        gL.lineWidth = Math.max(0.55, Math.min(2.6, sc * 0.5) * (1 - u * 0.65));
+        gL.stroke(paths[d]);
+      }
+      // the growing tips glow
+      gL.fillStyle = dark ? "rgba(216,245,160,0.85)" : "rgba(61,90,26,0.8)";
+      for (let k = 0; k < tips.length; k += 2) { gL.beginPath(); gL.arc(tips[k], tips[k + 1], 1.6, 0, 6.2832); gL.fill(); }
+      gL.globalCompositeOperation = "source-over";
+      rdL.textContent = `turn ${ang.toFixed(1)}° · ${P.n} rewrites · ${str.length.toLocaleString()} symbols · ${nseg.toLocaleString()} segments${grow < 1 ? " · growing" : ""}`;
+      requestAnimationFrame(frame);
+    };
+    new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !vis) { vis = true; lastT = 0; requestAnimationFrame(frame); } if (!v) vis = false; }).observe(lab);
+    const aim = e => { const r = cvL.getBoundingClientRect(), u = (e.clientX - r.left) / r.width; tang = PLANTS[kind].ang + (u - 0.5) * 26; hov = true; };
+    cvL.addEventListener("pointermove", aim);
+    cvL.addEventListener("pointerleave", () => { hov = false; });
+    let tapL = null; const isTap = (d, e) => d && performance.now() - d[2] < 320 && Math.hypot(e.clientX - d[0], e.clientY - d[1]) < 12;
+    cvL.addEventListener("pointerdown", e => { if (e.pointerType !== "mouse") { aim(e); tapL = [e.clientX, e.clientY, performance.now()]; return; } seed++; expand(); });
+    cvL.addEventListener("pointerup", e => { if (e.pointerType !== "mouse") { hov = false; if (isTap(tapL, e)) { seed++; expand(); } tapL = null; } });
+  }
+
+  // ---------- Lab slot 11: flock. Reynolds' boids: separation, alignment, cohesion ----------
+  {
+    const lab = document.getElementById("lab-b"), cvB = document.getElementById("flock"), gB = cvB.getContext("2d"), rdB = document.getElementById("bread");
+    const pbtnB = [...lab.querySelectorAll(".mag button[data-p]")];
+    const MODES = {
+      starlings: { word: "starlings", sep: 0.5, ali: 0.07, coh: 0.0035, see: 44, min: 2.2, max: 3.9, noise: 0.06, hue: [250, 330] },
+      fish: { word: "fish", sep: 0.42, ali: 0.12, coh: 0.0024, see: 52, min: 1.3, max: 2.5, noise: 0.03, hue: [175, 235] },
+      gnats: { word: "gnats", sep: 0.28, ali: 0, coh: 0.011, see: 70, min: 0.6, max: 3.2, noise: 1.1, hue: [35, 75] }
+    };
+    let BW = 0, BH = 0, vis = false, lastT = 0, mode = "starlings", N = 0, hawk = false, hx = 0, hy = 0, bait = 0, bx = 0, by = 0, phi = 0;
+    let X = new Float32Array(0), Y = X, VX = X, VY = X, head = new Int32Array(0), next = new Int32Array(0);
+    const seedFlock = () => {
+      N = Math.max(140, Math.min(340, Math.round(BW * BH / 2300)));
+      X = new Float32Array(N); Y = new Float32Array(N); VX = new Float32Array(N); VY = new Float32Array(N); next = new Int32Array(N);
+      const a0 = Math.random() * 6.28;
+      for (let i = 0; i < N; i++) { X[i] = BW * (0.3 + Math.random() * 0.4); Y[i] = BH * (0.3 + Math.random() * 0.4); const a = a0 + (Math.random() - 0.5) * 2.4; VX[i] = Math.cos(a) * 2.5; VY[i] = Math.sin(a) * 2.5; }
+    };
+    const size = () => {
+      const r = lab.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1), oW = BW, oH = BH;
+      BW = r.width; BH = r.height; cvB.width = Math.round(BW * dpr); cvB.height = Math.round(BH * dpr); gB.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (!N) { if (BW && BH) seedFlock(); } else if (oW && oH) for (let i = 0; i < N; i++) { X[i] *= BW / oW; Y[i] *= BH / oH; }
+    };
+    size(); new ResizeObserver(size).observe(lab);
+    const setMode = m => { mode = m; pbtnB.forEach(b => b.setAttribute("aria-pressed", b.dataset.p === m ? "true" : "false")); };
+    pbtnB.forEach(b => b.addEventListener("click", e => { e.stopPropagation(); setMode(b.dataset.p); }));
+    const step = s => {
+      const M = MODES[mode], see = M.see, see2 = see * see, sepR = 20, cols = Math.max(1, Math.ceil(BW / see)), rows = Math.max(1, Math.ceil(BH / see));
+      if (head.length < cols * rows) head = new Int32Array(cols * rows);
+      head.fill(-1);
+      for (let i = 0; i < N; i++) { const c = Math.min(cols - 1, Math.max(0, (X[i] / see) | 0)) + Math.min(rows - 1, Math.max(0, (Y[i] / see) | 0)) * cols; next[i] = head[c]; head[c] = i; }
+      const L = 24, Rt = BW - 24, T = 70, B = BH - 96, edge = 80;
+      let sx = 0, sy = 0;
+      for (let i = 0; i < N; i++) {
+        const xi = X[i], yi = Y[i], ci = Math.min(cols - 1, Math.max(0, (xi / see) | 0)), ri = Math.min(rows - 1, Math.max(0, (yi / see) | 0));
+        let n = 0, cx = 0, cy = 0, ax = 0, ay = 0, px = 0, py = 0;
+        for (let rr = Math.max(0, ri - 1); rr <= Math.min(rows - 1, ri + 1); rr++) for (let cc = Math.max(0, ci - 1); cc <= Math.min(cols - 1, ci + 1); cc++) {
+          for (let j = head[cc + rr * cols]; j !== -1; j = next[j]) {
+            if (j === i) continue;
+            const dx = X[j] - xi, dy = Y[j] - yi, d2 = dx * dx + dy * dy;
+            if (d2 > see2) continue;
+            n++; cx += X[j]; cy += Y[j]; ax += VX[j]; ay += VY[j];
+            if (d2 < sepR * sepR && d2 > 0.01) { const d = Math.sqrt(d2), w = (sepR - d) / sepR / d; px -= dx * w; py -= dy * w; }
+          }
+        }
+        let fx = px * M.sep, fy = py * M.sep;
+        if (n) { fx += (ax / n - VX[i]) * M.ali + (cx / n - xi) * M.coh; fy += (ay / n - VY[i]) * M.ali + (cy / n - yi) * M.coh; }
+        // steering is limited, as in Reynolds' original: no bird can turn on a dime
+        const fm = Math.hypot(fx, fy), cap = 0.16; if (fm > cap) { fx *= cap / fm; fy *= cap / fm; }
+        // soft walls: turn back near the edges of the panel
+        if (xi < L + edge) fx += 0.3 * Math.min(1.5, 1 - (xi - L) / edge); if (xi > Rt - edge) fx -= 0.3 * Math.min(1.5, 1 - (Rt - xi) / edge);
+        if (yi < T + edge) fy += 0.3 * Math.min(1.5, 1 - (yi - T) / edge); if (yi > B - edge) fy -= 0.3 * Math.min(1.5, 1 - (B - yi) / edge);
+        if (hawk) { const dx = xi - hx, dy = yi - hy, d = Math.hypot(dx, dy) || 1; if (d < 150) { const w = 0.9 * (1 - d / 150); fx += dx / d * w; fy += dy / d * w; } }
+        if (bait > 0) { const dx = bx - xi, dy = by - yi, d = Math.hypot(dx, dy) || 1; fx += dx / d * 0.07; fy += dy / d * 0.07; }
+        fx += (Math.random() - 0.5) * M.noise * 0.3; fy += (Math.random() - 0.5) * M.noise * 0.3;
+        let vx = VX[i] + fx * s, vy = VY[i] + fy * s; const sp = Math.hypot(vx, vy) || 1;
+        const lim = Math.min(M.max, Math.max(M.min, sp)); vx *= lim / sp; vy *= lim / sp;
+        VX[i] = vx; VY[i] = vy; sx += vx / lim; sy += vy / lim;
+      }
+      for (let i = 0; i < N; i++) {
+        X[i] += VX[i] * s; Y[i] += VY[i] * s;
+        if (X[i] < 2) { X[i] = 2; VX[i] = Math.abs(VX[i]); } else if (X[i] > BW - 2) { X[i] = BW - 2; VX[i] = -Math.abs(VX[i]); }
+        if (Y[i] < 2) { Y[i] = 2; VY[i] = Math.abs(VY[i]); } else if (Y[i] > BH - 2) { Y[i] = BH - 2; VY[i] = -Math.abs(VY[i]); }
+      }
+      phi = Math.hypot(sx, sy) / N;
+    };
+    const frame = t => {
+      if (!vis) return;
+      const dt = lastT ? Math.min(50, t - lastT) : 16; lastT = t;
+      if (!N) { if (BW && BH) seedFlock(); else { requestAnimationFrame(frame); return; } }
+      const s = dt / 16.67 * (reduceMotion ? 0.5 : 1);
+      step(s); if (bait > 0) bait -= dt;
+      const dark = root.dataset.theme !== "light", M = MODES[mode], BK = 10, paths = [];
+      for (let k = 0; k < BK; k++) paths.push(new Path2D());
+      // each bird is a short streak along its velocity, tinted by heading
+      for (let i = 0; i < N; i++) {
+        const h = (Math.atan2(VY[i], VX[i]) / 6.2832 + 1) % 1, k = Math.min(BK - 1, (((0.5 - 0.5 * Math.cos(h * 6.2832)) * BK) | 0));
+        const p = paths[k]; p.moveTo(X[i], Y[i]); p.lineTo(X[i] - VX[i] * 3.4, Y[i] - VY[i] * 3.4);
+      }
+      gB.clearRect(0, 0, BW, BH);
+      gB.globalCompositeOperation = dark ? "lighter" : "source-over"; gB.lineCap = "round"; gB.lineWidth = mode === "gnats" ? 1.6 : 1.4;
+      for (let k = 0; k < BK; k++) { const hu = M.hue[0] + (M.hue[1] - M.hue[0]) * k / (BK - 1); gB.strokeStyle = dark ? `hsla(${hu},85%,74%,0.85)` : `hsla(${hu},60%,30%,0.85)`; gB.stroke(paths[k]); }
+      if (bait > 0) { const a = Math.min(1, bait / 600); gB.fillStyle = dark ? `rgba(255,211,138,${a})` : `rgba(138,74,0,${a})`; gB.beginPath(); gB.arc(bx, by, 3, 0, 6.2832); gB.fill(); gB.globalAlpha = a * 0.3; gB.beginPath(); gB.arc(bx, by, 9, 0, 6.2832); gB.fill(); gB.globalAlpha = 1; }
+      if (hawk) { gB.strokeStyle = dark ? "rgba(255,255,255,0.10)" : "rgba(20,20,27,0.12)"; gB.lineWidth = 1; gB.setLineDash([3, 6]); gB.beginPath(); gB.arc(hx, hy, 150, 0, 6.2832); gB.stroke(); gB.setLineDash([]); }
+      gB.globalCompositeOperation = "source-over";
+      const mood = phi > 0.85 ? " · moving as one" : phi < 0.3 ? " · milling about" : "";
+      rdB.textContent = `${N} ${M.word} · alignment ${phi.toFixed(2)}${mood}${hawk ? " · hawk overhead" : ""}${bait > 0 ? " · bait" : ""}`;
+      requestAnimationFrame(frame);
+    };
+    new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !vis) { vis = true; lastT = 0; requestAnimationFrame(frame); } if (!v) vis = false; }).observe(lab);
+    const at = e => { const r = cvB.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+    cvB.addEventListener("pointermove", e => { if (e.pointerType !== "mouse") return; [hx, hy] = at(e); hawk = true; });
+    cvB.addEventListener("pointerleave", () => { hawk = false; });
+    cvB.addEventListener("pointerdown", e => { [bx, by] = at(e); bait = 4000; });
+  }
+
+  // ---------- Lab slot 12: fireflies. The Kuramoto model: coupled oscillators that fall into step ----------
+  {
+    const lab = document.getElementById("lab-k"), cvK = document.getElementById("flies"), gK = cvK.getContext("2d"), rdK = document.getElementById("kread"), eqK = document.getElementById("keq");
+    const pbtnK = [...lab.querySelectorAll(".mag button[data-p]")], sbtn = lab.querySelector('.mag button[data-act="scatter"]');
+    const TAU = Math.PI * 2, N = 240, W0 = TAU / 1.1, SIG = 0.5, KC = SIG * Math.sqrt(8 / Math.PI), KMAX = 3.2, KDEF = { local: 2.6, global: 1.25 };
+    // Natural flash rates are spread on a bell curve; below the critical coupling Kc no amount of waiting brings them into step.
+    const gauss = () => Math.sqrt(-2 * Math.log(1 - Math.random())) * Math.cos(TAU * Math.random());
+    const th = new Float32Array(N), om = new Float32Array(N), fl = new Float32Array(N), U = new Float32Array(N), V = new Float32Array(N), DU = new Float32Array(N), DV = new Float32Array(N), dth = new Float32Array(N);
+    for (let i = 0; i < N; i++) { th[i] = Math.random() * TAU; om[i] = W0 + SIG * gauss(); U[i] = Math.random(); V[i] = Math.random(); }
+    let KW = 0, KH = 0, vis = false, lastT = 0, mode = "local", K = KDEF.local, tK = K, hov = false, R = 0;
+    const size = () => { const r = lab.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1); KW = r.width; KH = r.height; cvK.width = Math.round(KW * dpr); cvK.height = Math.round(KH * dpr); gK.setTransform(dpr, 0, 0, dpr, 0, 0); };
+    size(); new ResizeObserver(size).observe(lab);
+    const glow = (() => { const c = document.createElement("canvas"); c.width = c.height = 64; const x = c.getContext("2d"), g = x.createRadialGradient(32, 32, 0, 32, 32, 32); g.addColorStop(0, "rgba(246,255,196,1)"); g.addColorStop(0.18, "rgba(222,255,140,0.75)"); g.addColorStop(0.5, "rgba(170,240,90,0.18)"); g.addColorStop(1, "rgba(150,230,80,0)"); x.fillStyle = g; x.fillRect(0, 0, 64, 64); return c; })();
+    const EQ = { local: "dθᵢ/dt = ωᵢ + (K/nᵢ) Σ sin(θⱼ − θᵢ) over the fireflies it can see · it flashes each time θ passes 2π", global: "dθᵢ/dt = ωᵢ + (K/N) Σⱼ sin(θⱼ − θᵢ) · every firefly sees every other · it flashes each time θ passes 2π" };
+    const setMode = m => { mode = m; K = tK = KDEF[m]; eqK.textContent = EQ[m]; pbtnK.forEach(b => b.setAttribute("aria-pressed", b.dataset.p === m ? "true" : "false")); };
+    pbtnK.forEach(b => b.addEventListener("click", e => { e.stopPropagation(); setMode(b.dataset.p); }));
+    const scatter = () => { for (let i = 0; i < N; i++) { th[i] = Math.random() * TAU; DU[i] += (Math.random() - 0.5) * 0.12; DV[i] += (Math.random() - 0.5) * 0.12; } };
+    sbtn.addEventListener("click", e => { e.stopPropagation(); scatter(); });
+    const region = () => { const l = KW * 0.05, r = KW * 0.95, t = 78, b = KH - 108; return [l, t, Math.max(1, r - l), Math.max(1, b - t)]; };
+    const step = h => {
+      let sx = 0, sy = 0; for (let i = 0; i < N; i++) { sx += Math.cos(th[i]); sy += Math.sin(th[i]); }
+      R = Math.hypot(sx, sy) / N; const psi = Math.atan2(sy, sx);
+      if (mode === "global") for (let i = 0; i < N; i++) dth[i] = om[i] + K * R * Math.sin(psi - th[i]);
+      else {
+        const [, , w, hh] = region(), sight = 0.2 * Math.min(w, hh), s2 = sight * sight;
+        for (let i = 0; i < N; i++) {
+          let acc = 0, n = 0; const xi = U[i] * w, yi = V[i] * hh;
+          for (let j = 0; j < N; j++) { if (j === i) continue; const dx = U[j] * w - xi, dy = V[j] * hh - yi; if (dx * dx + dy * dy < s2) { acc += Math.sin(th[j] - th[i]); n++; } }
+          dth[i] = om[i] + (n ? K * acc / n : 0);
+        }
+      }
+      for (let i = 0; i < N; i++) { th[i] += dth[i] * h; if (th[i] >= TAU) { th[i] -= TAU; fl[i] = 1; } else if (th[i] < 0) th[i] += TAU; fl[i] *= Math.exp(-h / 0.17); }
+    };
+    const frame = t => {
+      if (!vis) return;
+      const dt = lastT ? Math.min(50, t - lastT) : 16; lastT = t;
+      if (!hov) tK = KDEF[mode];
+      K += (tK - K) * 0.06;
+      let rem = dt / 1000; while (rem > 1e-6) { const h = Math.min(0.02, rem); step(h); rem -= h; }
+      // they drift slowly through the dark
+      if (!reduceMotion) for (let i = 0; i < N; i++) {
+        DU[i] = DU[i] * 0.98 + (Math.random() - 0.5) * 0.0016; DV[i] = DV[i] * 0.98 + (Math.random() - 0.5) * 0.0016;
+        U[i] += DU[i] * dt / 1000; V[i] += DV[i] * dt / 1000;
+        if (U[i] < 0) { U[i] = 0; DU[i] = Math.abs(DU[i]); } if (U[i] > 1) { U[i] = 1; DU[i] = -Math.abs(DU[i]); }
+        if (V[i] < 0) { V[i] = 0; DV[i] = Math.abs(DV[i]); } if (V[i] > 1) { V[i] = 1; DV[i] = -Math.abs(DV[i]); }
+      }
+      const dark = root.dataset.theme !== "light", [l, tp, w, hh] = region();
+      gK.clearRect(0, 0, KW, KH);
+      if (dark) {
+        gK.globalCompositeOperation = "lighter";
+        for (let i = 0; i < N; i++) {
+          const x = l + U[i] * w, y = tp + V[i] * hh, f = fl[i];
+          gK.globalAlpha = 0.24 + 0.1 * Math.sin(th[i]); gK.fillStyle = "#9fd36a"; gK.beginPath(); gK.arc(x, y, 1.3, 0, TAU); gK.fill();
+          if (f > 0.02) { const s = 10 + f * 34; gK.globalAlpha = f; gK.drawImage(glow, x - s / 2, y - s / 2, s, s); }
+        }
+      } else {
+        for (let i = 0; i < N; i++) {
+          const x = l + U[i] * w, y = tp + V[i] * hh, f = fl[i];
+          gK.globalAlpha = 0.22; gK.fillStyle = "#4d5a1a"; gK.beginPath(); gK.arc(x, y, 1.2, 0, TAU); gK.fill();
+          if (f > 0.02) { gK.globalAlpha = f * 0.9; gK.fillStyle = "#5a6b00"; gK.beginPath(); gK.arc(x, y, 1.8 + f * 3, 0, TAU); gK.fill(); gK.globalAlpha = f * 0.35; gK.strokeStyle = "#8a6a00"; gK.lineWidth = 1; gK.beginPath(); gK.arc(x, y, 4 + f * 9, 0, TAU); gK.stroke(); }
+        }
+      }
+      gK.globalAlpha = 1; gK.globalCompositeOperation = "source-over";
+      const mood = R > 0.8 ? "flashing as one" : R > 0.4 ? "falling into step" : "each on its own";
+      rdK.textContent = `K ${K.toFixed(2)}${mode === "global" ? ` · in step above K ≈ ${KC.toFixed(2)}` : ""} · sync r = ${R.toFixed(2)} · ${mood}`;
+      requestAnimationFrame(frame);
+    };
+    new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !vis) { vis = true; lastT = 0; requestAnimationFrame(frame); } if (!v) vis = false; }).observe(lab);
+    const aim = e => { const r = cvK.getBoundingClientRect(), u = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)); tK = u * KMAX * (mode === "local" ? 1.4 : 1); hov = true; };
+    cvK.addEventListener("pointermove", aim);
+    cvK.addEventListener("pointerleave", () => { hov = false; });
+    let tapK = null; const isTap = (d, e) => d && performance.now() - d[2] < 320 && Math.hypot(e.clientX - d[0], e.clientY - d[1]) < 12;
+    cvK.addEventListener("pointerdown", e => { if (e.pointerType !== "mouse") { aim(e); tapK = [e.clientX, e.clientY, performance.now()]; return; } scatter(); });
+    cvK.addEventListener("pointerup", e => { if (e.pointerType !== "mouse") { hov = false; if (isTap(tapK, e)) scatter(); tapK = null; } });
+  }
+
+  // ---------- Notes: a small ? on each toy opens a plain-words explanation ----------
+  {
+    let openB = null;
+    const close = () => { if (!openB) return; openB.setAttribute("aria-expanded", "false"); document.getElementById(openB.getAttribute("aria-controls")).hidden = true; openB = null; };
+    document.querySelectorAll("[data-note]").forEach((host, i) => {
+      const b = document.createElement("button"), n = document.createElement("p");
+      n.className = "note"; n.id = "note-" + i; n.hidden = true; n.textContent = host.dataset.note;
+      b.type = "button"; b.className = "qbtn"; b.textContent = "?"; b.setAttribute("aria-label", "What is this?"); b.setAttribute("aria-expanded", "false"); b.setAttribute("aria-controls", n.id);
+      b.addEventListener("pointerdown", e => e.stopPropagation());
+      b.addEventListener("click", e => { e.stopPropagation(); const was = openB === b; close(); if (!was) { n.hidden = false; b.setAttribute("aria-expanded", "true"); openB = b; } });
+      n.addEventListener("pointerdown", e => e.stopPropagation());
+      host.append(b, n);
+    });
+    document.addEventListener("pointerdown", e => { if (openB && !e.target.closest(".note, .qbtn")) close(); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape" && openB) { const b = openB; close(); b.focus(); } });
   }
 
   // ---------- Celestial paintbrush: the cursor paints, and changes with each toy ----------
@@ -1989,7 +2322,7 @@ void main(){
       b.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     sizeB(); window.addEventListener("resize", sizeB);
-    const ZONES = [["nebula", document.getElementById("heroband")], ["scope", document.getElementById("lab-2")], ["harm", document.getElementById("lab-h")], ["rd", document.getElementById("lab-rd")], ["julia", document.getElementById("lab-j")], ["four", document.getElementById("lab-f")], ["mold", document.getElementById("lab-m")], ["bolt", document.getElementById("lab-e")], ["dna", document.getElementById("lab-dna")], ["fibs", document.getElementById("lab-s")]];
+    const ZONES = [["nebula", document.getElementById("heroband")], ["scope", document.getElementById("lab-2")], ["fibs", document.getElementById("lab-s")], ["harm", document.getElementById("lab-h")], ["rd", document.getElementById("lab-rd")], ["julia", document.getElementById("lab-j")], ["four", document.getElementById("lab-f")], ["mold", document.getElementById("lab-m")], ["bolt", document.getElementById("lab-e")], ["dna", document.getElementById("lab-dna")], ["lsys", document.getElementById("lab-l")], ["flock", document.getElementById("lab-b")], ["flies", document.getElementById("lab-k")]];
     const zoneAt = (x, y) => {
       for (const [z, el] of ZONES) { const r = el.getBoundingClientRect(); if (y >= r.top && y <= r.bottom && x >= r.left && x <= r.right) return z; }
       return "sky";
@@ -2013,6 +2346,12 @@ void main(){
         parts.push({ k: "zap", x, y, vx: 0, vy: 0, r: 1, pts, c: dark ? "#d6dcff" : "#2a1d80", life: 260 + R() * 260, t: 0 });
       } else if (z === "fibs") {
         parts.push({ k: "orbit", cx: x, cy: y, x, y, vx: 0, vy: 0, r: 3 + R() * 10, a: R() * 6.28, w: 2.39996, c: pick(dark ? ["#d8caff", "#b49aff", "#ffd38a"] : ["#4a2aa8", "#281a6e", "#8a4a00"]), life: 700 + R() * 600, t: 0 });
+      } else if (z === "lsys") {
+        parts.push({ k: "spot", x: x + (R() - 0.5) * 6, y: y + (R() - 0.5) * 6, vx: 0, vy: -0.03, r: 1 + R() * 2.4, c: pick(dark ? ["#7fe0a8", "#c9a6ff", "#d8f5a0"] : ["#1f6b45", "#5b3cc4", "#3d5a1a"]), life: 1100 + R() * 800, t: 0 });
+      } else if (z === "flock") {
+        parts.push({ k: "spark", x, y, vx: (R() - 0.5) * 0.9, vy: (R() - 0.5) * 0.9, r: 0.8 + R() * 1.2, c: pick(dark ? ["#a9c8ff", "#ff9bd6", "#c9b6ff"] : ["#1f4f9a", "#a0145a", "#4a2aa8"]), life: 600 + R() * 600, t: 0 });
+      } else if (z === "flies") {
+        parts.push({ k: "dust", x, y, vx: (R() - 0.5) * 0.2, vy: -0.05 - R() * 0.12, r: 1 + R() * 1.6, c: pick(dark ? ["#e8ff9a", "#c6f26a", "#ffd38a"] : ["#4d6a00", "#6b5a00", "#8a4a00"]), life: 1100 + R() * 1100, t: 0, ph: R() * 6 });
       } else if (z === "dna") {
         parts.push({ k: "spot", x: x + (R() - 0.5) * 8, y: y + (R() - 0.5) * 8, vx: 0, vy: 0, r: 1.5 + R() * 3, c: pick(dark ? ["#ffd38a", "#b48cff", "#7ae0ff", "#ff7ac8"] : ["#8a4a00", "#4a2aa8", "#0b5e86", "#a0145a"]), life: 1000 + R() * 800, t: 0 });
       } else if (z === "mold") {
@@ -2059,6 +2398,23 @@ void main(){
         // a sunflower head: dots placed by the golden angle
         b.fillStyle = dark ? "#d8caff" : "#4a2aa8"; b.globalAlpha = 0.95;
         for (let i = 1; i <= 21; i++) { const rr2 = 2.6 * Math.sqrt(i), a2 = i * 2.39996 + t * 0.0008; b.beginPath(); b.arc(rr2 * Math.cos(a2), rr2 * Math.sin(a2), i === 21 ? 1.6 : 1.05, 0, 6.2832); b.fill(); }
+      } else if (z === "lsys") {
+        // a sprig: one stem, two branches, each branching again
+        const sw = Math.sin(t * 0.002) * 0.15;
+        b.strokeStyle = dark ? "#9ff0c0" : "#1f6b45"; b.lineWidth = 1.5; b.globalAlpha = 0.95; b.lineCap = "round";
+        const br = (x0, y0, a, L, d) => { const x1 = x0 + Math.cos(a) * L, y1 = y0 + Math.sin(a) * L; b.moveTo(x0, y0); b.lineTo(x1, y1); if (d) { br(x1, y1, a - 0.5 + sw, L * 0.62, d - 1); br(x1, y1, a + 0.5 + sw, L * 0.62, d - 1); } };
+        b.beginPath(); br(0, 12, -1.5708 + sw * 0.5, 10, 2); b.stroke();
+      } else if (z === "flock") {
+        // a bird, flapping
+        const f = Math.sin(t * 0.014) * 4;
+        b.strokeStyle = dark ? "#c9d8ff" : "#1f4f9a"; b.lineWidth = 1.6; b.globalAlpha = 0.95; b.lineJoin = "round"; b.lineCap = "round";
+        b.beginPath(); b.moveTo(-11, -3 + f); b.quadraticCurveTo(-5, -4, 0, 2); b.quadraticCurveTo(5, -4, 11, -3 + f); b.stroke();
+      } else if (z === "flies") {
+        // a firefly, flashing every 1.1 seconds
+        const ph = (t % 1100) / 1100, f = Math.exp(-ph * 7);
+        b.fillStyle = dark ? "#e8ff9a" : "#5a6b00"; b.globalAlpha = 0.5 + 0.5 * f;
+        b.beginPath(); b.arc(0, 0, 2.6, 0, 6.2832); b.fill();
+        b.globalAlpha = f * (dark ? 0.35 : 0.25); b.beginPath(); b.arc(0, 0, 5 + f * 9, 0, 6.2832); b.fill();
       } else if (z === "dna") {
         // a tiny turning double helix
         b.lineWidth = 1.4; b.globalAlpha = 0.95;
@@ -2177,7 +2533,7 @@ void main(){
 
   // ---------- Scrollbar: takes the colours of the toy in view ----------
   {
-    const zs = [["nebula", "heroband"], ["scope", "lab-2"], ["harm", "lab-h"], ["rd", "lab-rd"], ["julia", "lab-j"], ["four", "lab-f"], ["mold", "lab-m"], ["bolt", "lab-e"], ["dna", "lab-dna"], ["fibs", "lab-s"]].map(([z, id]) => [z, document.getElementById(id)]);
+    const zs = [["nebula", "heroband"], ["scope", "lab-2"], ["fibs", "lab-s"], ["harm", "lab-h"], ["rd", "lab-rd"], ["julia", "lab-j"], ["four", "lab-f"], ["mold", "lab-m"], ["bolt", "lab-e"], ["dna", "lab-dna"], ["lsys", "lab-l"], ["flock", "lab-b"], ["flies", "lab-k"]].map(([z, id]) => [z, document.getElementById(id)]);
     let raf = 0;
     const upd = () => {
       raf = 0; const mid = innerHeight / 2; let cur = "sky";
